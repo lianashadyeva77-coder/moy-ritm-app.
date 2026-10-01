@@ -38,7 +38,7 @@ body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:54
 
 h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask-wrap{position:relative;overflow:hidden;border-radius:19px}.daytask{position:relative;z-index:2;background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02);transform:translateX(0);transition:transform .18s ease}.daytask.swiping{transition:none}.daytask-delete{position:absolute;inset:0;width:100%;background:#ececea;color:#ff3b30;border:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.daytask-delete svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.left{display:flex;align-items:center;gap:12px;min-width:0}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;flex:0 0 24px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
 
-.tasklib{display:grid;grid-template-columns:1fr;gap:10px}.library-task-wrap{position:relative;overflow:hidden;border-radius:20px;touch-action:pan-y}.library-task-wrap .tile{position:relative;z-index:2}.library-task-wrap.swiping .tile{transition:none}.library-task-delete{position:absolute;inset:0;width:100%;border:0;background:#ececea;color:#ff3b30;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.library-task-delete svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
+.tasklib{display:grid;grid-template-columns:1fr;gap:10px}.library-task-wrap{position:relative;overflow:hidden;border-radius:20px;touch-action:pan-y;overscroll-behavior-x:none;-webkit-user-select:none;user-select:none}.library-task-wrap .tile{position:relative;z-index:2}.library-task-wrap.swiping .tile{transition:none}.library-task-delete{position:absolute;inset:0;width:100%;border:0;background:#ececea;color:#ff3b30;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.library-task-delete svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
 .tile{appearance:none;width:100%;height:82px;min-height:82px;max-height:82px;flex:0 0 82px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px 16px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
 .tile:active{transform:none}
 .tile.selected{background:var(--selected-bg);border-color:var(--accent);box-shadow:0 4px 14px var(--selected-shadow)}
@@ -486,63 +486,105 @@ function attachLibraryTaskSwipe(box){
    const row=wrap.querySelector('.tile');
    const trash=wrap.querySelector('.library-task-delete');
    if(!row||!trash)return;
-   let sx=0,sy=0,dx=0,tracking=false,horizontal=false,moved=false,suppressClick=false;
+
+   let sx=0,sy=0,dx=0,tracking=false,horizontal=false,moved=false,pointerId=null;
+
    const reset=()=>{
      row.style.transition='transform .2s ease';
      row.style.transform='translate3d(0,0,0)';
      row.classList.remove('swiping');
-     dx=0; tracking=false; horizontal=false; moved=false;
+     dx=0; tracking=false; horizontal=false; moved=false; pointerId=null;
    };
-   const start=e=>{
-     const t=e.touches?e.touches[0]:e;
-     sx=t.clientX; sy=t.clientY; dx=0; tracking=true; horizontal=false; moved=false;
-     row.style.transition='none'; row.classList.add('swiping');
+
+   const closeOthers=()=>{
+     box.querySelectorAll('.library-task-wrap').forEach(other=>{
+       if(other!==wrap){
+         const r=other.querySelector('.tile');
+         if(r) r.style.transform='translate3d(0,0,0)';
+       }
+     });
    };
-   const move=e=>{
-     if(!tracking)return;
-     const t=e.touches?e.touches[0]:e;
-     const mx=t.clientX-sx, my=t.clientY-sy;
+
+   const start=(e)=>{
+     if(e.target.closest && e.target.closest('.library-task-delete')) return;
+     closeOthers();
+     sx=e.clientX; sy=e.clientY; dx=0;
+     tracking=true; horizontal=false; moved=false; pointerId=e.pointerId;
+     row.style.transition='none';
+     row.classList.add('swiping');
+     try{wrap.setPointerCapture(e.pointerId)}catch(_){}
+   };
+
+   const move=(e)=>{
+     if(!tracking || e.pointerId!==pointerId)return;
+     const mx=e.clientX-sx, my=e.clientY-sy;
+
      if(!horizontal){
-       if(Math.abs(my)>Math.abs(mx)+8){ tracking=false; reset(); return; }
+       if(Math.abs(my)>Math.abs(mx)+8){
+         tracking=false;
+         row.style.transition='transform .18s ease';
+         row.style.transform='translate3d(0,0,0)';
+         row.classList.remove('swiping');
+         return;
+       }
        if(Math.abs(mx)>10) horizontal=true;
      }
+
      if(!horizontal)return;
+
      if(e.cancelable)e.preventDefault();
      moved=true;
-     dx=Math.max(-82,Math.min(0,mx));
+     dx=Math.max(-96,Math.min(0,mx));
      row.style.transform=`translate3d(${dx}px,0,0)`;
    };
-   const end=()=>{
-     if(!tracking && !moved)return;
+
+   const end=(e)=>{
+     if(e.pointerId!==pointerId)return;
+     if(!tracking && !moved){ reset(); return; }
+
      tracking=false;
      row.classList.remove('swiping');
-     if(horizontal && dx<-42){
+
+     if(horizontal && dx<-48){
        row.style.transition='transform .18s ease';
-       row.style.transform='translate3d(-82px,0,0)';
-       suppressClick=true;
+       row.style.transform='translate3d(-96px,0,0)';
+       wrap.dataset.open='1';
      }else{
        row.style.transition='transform .18s ease';
        row.style.transform='translate3d(0,0,0)';
-       if(moved)suppressClick=true;
+       wrap.dataset.open='0';
      }
-     horizontal=false;
+
+     if(moved){
+       // Prevent the synthetic click generated after a touch swipe.
+       wrap.dataset.swiped='1';
+       setTimeout(()=>{wrap.dataset.swiped='0'},350);
+     }
+
+     horizontal=false; moved=false; dx=0; pointerId=null;
+     try{wrap.releasePointerCapture(e.pointerId)}catch(_){}
    };
-   const cancel=()=>{tracking=false;horizontal=false;moved=false;row.style.transition='transform .18s ease';row.style.transform='translate3d(0,0,0)';row.classList.remove('swiping')};
-   // Capture the click before the button's inline onclick, so a swipe never accidentally adds/completes the task.
+
+   wrap.addEventListener('pointerdown',start,{passive:true});
+   wrap.addEventListener('pointermove',move,{passive:false});
+   wrap.addEventListener('pointerup',end,{passive:true});
+   wrap.addEventListener('pointercancel',e=>{reset();try{wrap.releasePointerCapture(e.pointerId)}catch(_){}},{passive:true});
+
+   // Swiping must never trigger the tile's inline add/remove action.
    wrap.addEventListener('click',e=>{
-     if(suppressClick){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();suppressClick=false;}
+     if(wrap.dataset.swiped==='1'){
+       e.preventDefault();
+       e.stopPropagation();
+       e.stopImmediatePropagation();
+       wrap.dataset.swiped='0';
+     }
    },true);
-   // Close an open swipe when the user taps another library card.
-   wrap.addEventListener('touchstart',e=>{
-     box.querySelectorAll('.library-task-wrap').forEach(other=>{
-       if(other!==wrap){const r=other.querySelector('.tile');if(r)r.style.transform='translate3d(0,0,0)';}
-     });
-     start(e);
-   },{passive:true});
-   wrap.addEventListener('touchmove',move,{passive:false});
-   wrap.addEventListener('touchend',end,{passive:true});
-   wrap.addEventListener('touchcancel',cancel,{passive:true});
-   trash.addEventListener('click',e=>{e.stopPropagation();});
+
+   trash.addEventListener('click',e=>{
+     e.preventDefault();
+     e.stopPropagation();
+     deleteCustomTask(wrap.dataset.taskId);
+   });
  });
 }
 function deleteCustomTask(id){
