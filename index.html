@@ -46,7 +46,16 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .month-sheet-head{display:flex;align-items:center;gap:10px;margin:2px 0 18px}
 .month-sheet-head h3{flex:1;margin:0;text-align:center}
 .sheet-back{border:0;background:var(--card);width:38px;height:38px;border-radius:50%;font-size:26px;line-height:1;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.year-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.year-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px} .month-sheet{max-height:68vh;overflow:hidden;touch-action:none;transform:translateY(0);transition:max-height .28s cubic-bezier(.2,.8,.2,1)}
+.month-sheet.expanded{max-height:92vh;overflow:auto}
+.sheet-handle{width:38px;height:5px;border-radius:99px;background:#c9c4c6;margin:0 auto 12px;opacity:.8}
+.month-sheet-body{overflow:auto;max-height:calc(68vh - 70px);padding-bottom:20px}
+.month-sheet.expanded .month-sheet-body{max-height:calc(92vh - 70px)}
+.year-reveal{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.year-reveal-title{font-size:18px;font-weight:700;margin:0 0 12px}
+.detail-task{min-height:72px;padding:13px 14px;border:1px solid var(--line);border-radius:19px;background:var(--card);display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02)}
+.detail-task .name{font-size:16px;font-weight:600}
+
 .year-month{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px;cursor:pointer}
 .year-month-title{font-size:15px;font-weight:700;margin-bottom:8px;text-transform:capitalize}
 .mini-head,.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
@@ -199,15 +208,14 @@ refreshTaskUI();if(state.dayOpen)syncAddedList();
 }
 function updateDayHeaderOnly(){
 const d=dateFrom(state.date),planned=state.plans[state.date]||[],done=planned.filter(x=>x.done).length,pct=planned.length?Math.round(done/planned.length*100):0;
-const title=document.querySelector(".top h1"),progress=document.querySelector(".progress"),today=document.querySelector(".today-title"),pctEl=document.querySelector(".pct"),sub=document.querySelector(".sub"),bar=document.querySelector(".bar>i"),summary=document.querySelector(".day-summary"),added=document.querySelector(".added");
+const title=document.querySelector(".top h1"),today=document.querySelector(".today-title"),pctEl=document.querySelector(".pct"),sub=document.querySelector(".sub"),bar=document.querySelector(".bar>i"),summary=document.querySelector(".day-summary");
 if(title)title.textContent=d.toLocaleDateString("ru-RU",{month:"long"});
-if(progress)progress.style.backgroundImage=state.bg==="color"?"none":`url('${photos[state.bg]}')`,progress.style.backgroundColor=state.bg==="color"?state.solidColor:"";
 if(today)today.textContent=`Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}`;
 if(pctEl)pctEl.textContent=`${pct}%`;
 if(sub)sub.textContent=`${done} из ${planned.length} выполнено`;
 if(bar)bar.style.width=`${pct}%`;
-if(summary)summary.innerHTML=`<span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span>`;
-if(added)added.innerHTML=planned.length?planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><div class="time-row">${p.time?`<span class="time-btn set">${p.time}</span>`:""}<span class="check">${p.done?"✓":""}</span></div></div>`).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`;
+if(summary){const c=summary.querySelector(".count");if(c)c.textContent=planned.length?planned.length:"нет";summary.classList.toggle("open",!!state.dayOpen)}
+syncAddedList();syncSelectedTiles();
 }
 function refreshCalendarOnly(){
 const d=dateFrom(state.date),track=document.getElementById("track");
@@ -221,7 +229,11 @@ function attachCalendarClicksOnly(){
 const cal=document.getElementById("calendar");
 if(!cal)return;
 cal.querySelectorAll(".calendar-date").forEach(el=>el.addEventListener("click",()=>{
-if(Math.abs(window.__ritmSwipeDx||0)<8){state.date=el.dataset.date;save();render()}
+if(Math.abs(window.__ritmSwipeDx||0)<8){
+  state.date=el.dataset.date;save();
+  updateDayHeaderOnly();
+  refreshCalendarOnly();
+}
 }));
 }
 function shift(n){
@@ -295,10 +307,11 @@ function month(){
 let d=dateFrom(state.date),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),lead=(first.getDay()+6)%7,cells="";
 for(let i=0;i<lead;i++)cells+=`<div class="mday empty"></div>`;
 for(let n=1;n<=days;n++){let s=`${y}-${pad(m+1)}-${pad(n)}`,a=state.plans[s]||[];cells+=`<button class="mday ${s===state.date?"current":""} ${s===todayKey?"today":""}" onclick="openDay('${s}')">${n}<span class="count">${a.length?a.length+" дел.":""}</span></button>`}
-document.getElementById("modal").innerHTML=`<div class="sheet"><div class="month-sheet-head"><button class="sheet-back" onclick="yearView()">‹</button><h3>${d.toLocaleDateString("ru-RU",{month:"long",year:"numeric"})}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-head"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div><div class="month-grid">${cells}</div></div>`;
-document.getElementById("modal").style.display="flex"}
-function yearView(){
-const d=dateFrom(state.date),y=d.getFullYear();
+const modal=document.getElementById("modal");
+modal.innerHTML=`<div class="sheet month-sheet" id="monthSheet"><div class="sheet-handle" id="sheetHandle"></div><div class="month-sheet-head"><button class="sheet-back" onclick="yearView()">‹</button><h3>${d.toLocaleDateString("ru-RU",{month:"long",year:"numeric"})}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-sheet-body" id="monthSheetBody"><div class="month-head"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div><div class="month-grid">${cells}</div><div class="year-reveal"><div class="year-reveal-title">${y}</div>${buildYearGrid(y)}</div></div></div>`;
+modal.style.display="flex";attachMonthSheetGesture();
+}
+function buildYearGrid(y){
 let months="";
 for(let m=0;m<12;m++){
  const first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),lead=(first.getDay()+6)%7;
@@ -306,8 +319,22 @@ for(let m=0;m<12;m++){
  for(let n=1;n<=days;n++){const s=`${y}-${pad(m+1)}-${pad(n)}`,a=state.plans[s]||[];cells+=`<span class="mini-day ${s===todayKey?"today":""} ${a.length?"has":""}">${n}</span>`}
  months+=`<button class="year-month" onclick="state.date='${y}-${pad(m+1)}-01';save();month()"><div class="year-month-title">${first.toLocaleDateString("ru-RU",{month:"long"})}</div><div class="mini-head"><span>П</span><span>В</span><span>С</span><span>Ч</span><span>П</span><span>С</span><span>В</span></div><div class="mini-grid">${cells}</div></button>`;
 }
-document.getElementById("modal").innerHTML=`<div class="sheet"><div class="month-sheet-head"><button class="sheet-back" onclick="closeM()">‹</button><h3>${y}</h3><button class="close" onclick="closeM()">×</button></div><div class="year-grid">${months}</div></div>`;
-document.getElementById("modal").style.display="flex";
+return `<div class="year-grid">${months}</div>`;
+}
+function yearView(){
+const d=dateFrom(state.date),y=d.getFullYear();
+const modal=document.getElementById("modal");
+modal.innerHTML=`<div class="sheet month-sheet expanded" id="monthSheet"><div class="sheet-handle"></div><div class="month-sheet-head"><button class="sheet-back" onclick="month()">‹</button><h3>${y}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-sheet-body">${buildYearGrid(y)}</div></div>`;
+modal.style.display="flex";
+attachMonthSheetGesture();
+}
+function attachMonthSheetGesture(){
+const sheet=document.getElementById("monthSheet"),body=document.getElementById("monthSheetBody")||sheet?.querySelector(".month-sheet-body");if(!sheet||!body)return;
+let sy=0,dy=0,drag=false,startExpanded=sheet.classList.contains("expanded");
+const start=e=>{const t=e.touches?e.touches[0]:e;if(!e.target.closest(".sheet-handle,.month-sheet-head"))return;sy=t.clientY;dy=0;drag=true;startExpanded=sheet.classList.contains("expanded");sheet.style.transition="none"};
+const move=e=>{if(!drag)return;const t=e.touches?e.touches[0]:e;dy=t.clientY-sy;e.preventDefault();const base=startExpanded?92:68;const vh=window.innerHeight;const h=Math.max(60,Math.min(94,base-dy/vh*100));sheet.style.maxHeight=h+"vh";const progress=startExpanded?Math.max(0,Math.min(1,dy/vh*2)):Math.max(0,Math.min(1,-dy/vh*2));if(!startExpanded)body.scrollTop=progress*body.scrollHeight*.72;else body.scrollTop=(1-progress)*body.scrollHeight*.72;};
+const end=()=>{if(!drag)return;drag=false;sheet.style.transition="max-height .28s cubic-bezier(.2,.8,.2,1)";if(dy<-55){sheet.classList.add("expanded");sheet.style.maxHeight="92vh";setTimeout(()=>body.scrollTo({top:body.scrollHeight*.72,behavior:"smooth"}),30)}else if(dy>55){sheet.classList.remove("expanded");sheet.style.maxHeight="68vh";body.scrollTo({top:0,behavior:"smooth"})}else{sheet.style.maxHeight=startExpanded?"92vh":"68vh"}};
+sheet.addEventListener("touchstart",start,{passive:true});sheet.addEventListener("touchmove",move,{passive:false});sheet.addEventListener("touchend",end,{passive:true});
 }
 function pick(s){state.date=s;save();closeM();render()}function closeM(){document.getElementById("modal").style.display="none"}
 
@@ -329,11 +356,28 @@ function scheduleOpenReminder(p){
  if(!p.time||p.reminder===false)return; const [hh,mm]=p.time.split(":").map(Number); const d=dateFrom(state.date); d.setHours(hh,mm,0,0); const delay=d.getTime()-Date.now()-3600000; if(delay>0&&delay<2147483647){setTimeout(()=>{if("Notification" in window&&Notification.permission==="granted")new Notification(`Через час: ${p.name}`,{body:`Запланировано на ${p.time}`})},delay)}
 }
 function rescheduleOpenReminders(){(state.plans[state.date]||[]).forEach(scheduleOpenReminder)}
-function openDay(s){state.date=s;save();closeM();const d=dateFrom(s),a=state.plans[s]||[];document.body.insertAdjacentHTML("beforeend",`<div class="day-screen open" id="dayScreen"><div class="day-head"><button class="back" onclick="closeDay()">‹</button><div><div class="day-title">${d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</div><div class="day-subtitle">${a.length?a.length+" "+plural(a.length,"дело","дела","дел"):"Сегодня пока нет дел"}</div></div></div><div class="detail-list">${a.length?a.map((p,i)=>`<div class="detail-task ${p.done?"done":""}" onclick="detailToggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><div class="time-row"><button class="time-btn ${p.time?"set":""}" onclick="event.stopPropagation();openTimePicker(${i})">${formatTime(p.time)}</button><span class="check">${p.done?"✓":""}</span></div></div>`).join(""):`<div class="detail-empty">Здесь пока пусто.<br>Добавь дела на этот день.</div>`}</div><button class="detail-add" onclick="openAddSheet()">＋ Добавить дело</button></div>`)}
+function openDay(s,keepAdd=false){
+state.date=s;save();closeM();document.getElementById("dayScreen")?.remove();
+const d=dateFrom(s),a=state.plans[s]||[];
+document.body.insertAdjacentHTML("beforeend",`<div class="day-screen open" id="dayScreen"><div class="day-head"><button class="back" onclick="closeDay()">‹</button><div><div class="day-title">${d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</div><div class="day-subtitle">${a.length?a.length+" "+plural(a.length,"дело","дела","дел"):"Сегодня пока нет дел"}</div></div></div><div class="detail-list">${a.length?a.map((p,i)=>`<div class="detail-task ${p.done?"done":""}" onclick="detailToggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><div class="time-row"><button class="time-btn ${p.time?"set":""}" onclick="event.stopPropagation();openTimePicker(${i})">${formatTime(p.time)}</button><span class="check">${p.done?"✓":""}</span></div></div>`).join(""):`<div class="detail-empty">Здесь пока пусто.<br>Добавь дела на этот день.</div>`}</div><button class="detail-add" onclick="openAddSheet()">＋ Добавить дело</button></div>`);
+if(keepAdd)openAddSheet();
+}
 function closeDay(){document.getElementById("dayScreen")?.remove();render()}
 function detailToggle(i){const a=state.plans[state.date]||[];if(!a[i])return;a[i].done=!a[i].done;save();const screen=document.getElementById("dayScreen");if(screen){const row=screen.querySelectorAll(".detail-task")[i];if(row){row.classList.toggle("done",a[i].done);const c=row.querySelector(".check");if(c)c.textContent=a[i].done?"✓":""}}}
-function openAddSheet(){const chosen=new Set((state.plans[state.date]||[]).map(x=>x.id));const modal=document.createElement("div");modal.className="modal";modal.style.display="flex";modal.id="addModal";modal.innerHTML=`<div class="add-sheet"><button class="close" onclick="document.getElementById('addModal').remove()">×</button><h3>Добавить дело</h3><div class="tasklib">${tasks.map(t=>`<button class="tile ${chosen.has(t[0])?"selected":""}" onclick="addFromDetail('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${chosen.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</div></div>`;document.body.appendChild(modal)}
-function addFromDetail(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id))return;let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();document.getElementById("addModal")?.remove();document.getElementById("dayScreen")?.remove();openDay(state.date)}
+function openAddSheet(){
+const chosen=new Set((state.plans[state.date]||[]).map(x=>x.id));
+const modal=document.createElement("div");modal.className="modal";modal.style.display="flex";modal.id="addModal";
+modal.innerHTML=`<div class="add-sheet"><button class="close" onclick="document.getElementById('addModal')?.remove()">×</button><h3>Добавить дело</h3><div class="tasklib">${tasks.map(t=>`<button class="tile ${chosen.has(t[0])?"selected":""}" onclick="addFromDetail('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${chosen.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</div></div>`;
+document.body.appendChild(modal);
+}
+function addFromDetail(id){
+let a=state.plans[state.date]||[],idx=a.findIndex(x=>x.id===id);
+if(idx!==-1)a.splice(idx,1);else{let t=tasks.find(x=>x[0]===id);if(!t)return;a.push({id,name:t[1],done:false,time:"",reminder:false})}
+state.plans[state.date]=a;save();
+const modal=document.getElementById("addModal");
+if(modal){const chosen=new Set(a.map(x=>x.id));modal.querySelectorAll(".tile").forEach(tile=>{const m=tile.getAttribute("onclick")?.match(/addFromDetail\('([^']+)'\)/),tid=m&&m[1];if(!tid)return;const on=chosen.has(tid);tile.classList.toggle("selected",on);let c=tile.querySelector(".plus");if(on&&!c){c=document.createElement("span");c.className="plus";c.textContent="✓";tile.appendChild(c)}if(!on&&c)c.remove()})}
+openDay(state.date);
+}
 function applyAppearance(){
 document.documentElement.style.setProperty("--accent",state.accent==="pink"?"var(--pink)":"var(--green)");
 document.documentElement.style.setProperty("--selected-bg",state.accent==="pink"?"rgba(228,155,181,.12)":"rgba(47,118,104,.12)");
@@ -380,7 +424,15 @@ hex=hex.replace("#","");let r=parseInt(hex.slice(0,2),16)/255,g=parseInt(hex.sli
 let max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,h=0;if(d){if(max===r)h=60*(((g-b)/d)%6);else if(max===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4);if(h<0)h+=360}return {h,s:max?d/max:0,v:max}}
 function hsvToHex(h,s,v){let c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c,r=0,g=0,b=0;if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];return "#"+[r,g,b].map(q=>Math.round((q+m)*255).toString(16).padStart(2,"0")).join("")}
 function positionHue(h){const hk=document.getElementById("hueKnob");if(hk)hk.style.left=`${h/360*100}%`}
-function setSolidColor(c){state.solidColor=c;state.bg="color";save();applyAppearance();settings()}
+function updateSettingsUI(){
+const modal=document.getElementById("modal");if(!modal)return;
+modal.querySelectorAll(".opts .opt").forEach(b=>b.classList.remove("selected"));
+modal.querySelectorAll(".opts .opt").forEach(b=>{const a=b.getAttribute("onclick")||"";if((state.accent==="green"&&a.includes("setAccent('green'"))||(state.accent==="pink"&&a.includes("setAccent('pink'"))||(state.theme==="day"&&a.includes("setTheme('day'"))||(state.theme==="night"&&a.includes("setTheme('night'"))||(state.bg!=="color"&&a.includes(`setBg('${state.bg}'`))||(state.bg==="color"&&a.includes("setBg('color'")))b.classList.add("selected")});
+const prev=modal.querySelector(".color-preview");if(prev)prev.style.background=state.solidColor;
+modal.querySelectorAll(".color-swatch").forEach(b=>b.classList.toggle("selected",b.style.backgroundColor===state.solidColor||b.style.background===state.solidColor));
+positionHue(getHueFromHex(state.solidColor||"#d9d3d6"));
+}
+function setSolidColor(c){state.solidColor=c;state.bg="color";save();applyAppearance();updateSettingsUI()}
 function attachHuePicker(){
 const hu=document.getElementById("huePicker");if(!hu)return;let down=false;
 function point(e){const r=hu.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))}
@@ -392,12 +444,12 @@ const progress=document.querySelector(".progress");if(progress){progress.style.b
 }
 hu.addEventListener("pointerdown",e=>{down=true;hu.setPointerCapture(e.pointerId);apply(point(e))});
 hu.addEventListener("pointermove",e=>{if(down)apply(point(e))});
-hu.addEventListener("pointerup",()=>{down=false;settings()});
-hu.addEventListener("pointercancel",()=>{down=false;settings()});
+hu.addEventListener("pointerup",()=>{down=false;updateSettingsUI()});
+hu.addEventListener("pointercancel",()=>{down=false;updateSettingsUI()});
 }
-function setAccent(x){state.accent=x;save();applyAppearance();settings();syncSelectedTiles()}
-function setTheme(x){state.theme=x;save();applyAppearance();settings()}
-function setBg(x){state.bg=x;save();applyAppearance();settings()}
-applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=19");
+function setAccent(x){state.accent=x;save();applyAppearance();updateSettingsUI();syncSelectedTiles()}
+function setTheme(x){state.theme=x;save();applyAppearance();updateSettingsUI()}
+function setBg(x){state.bg=x;save();applyAppearance();updateSettingsUI()}
+applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=20");
 </script>
 </body></html>
