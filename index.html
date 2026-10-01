@@ -483,22 +483,57 @@ function renderTaskButtons(chosen, handler){
 function attachLibraryTaskSwipe(box){
  if(!box)return;
  box.querySelectorAll('.library-task-wrap').forEach(wrap=>{
-   const row=wrap.querySelector('.tile'); if(!row)return;
-   let sx=0,sy=0,dx=0,drag=false,vertical=false,locked=false;
-   const start=e=>{const t=e.touches?e.touches[0]:e;sx=t.clientX;sy=t.clientY;dx=0;drag=true;vertical=false;locked=false;row.classList.add('swiping')};
-   const move=e=>{
-     if(!drag)return; const t=e.touches?e.touches[0]:e; const mx=t.clientX-sx,my=t.clientY-sy;
-     if(!locked && Math.abs(my)>Math.abs(mx)+7){vertical=true;locked=true;row.style.transform='translateX(0)';return}
-     if(vertical)return;
-     if(!locked && Math.abs(mx)>7)locked=true;
-     if(mx>0)dx=0; else dx=Math.max(mx,-74);
-     row.style.transform=`translateX(${dx}px)`;
-     if(Math.abs(mx)>Math.abs(my)+4 && e.cancelable)e.preventDefault();
+   const row=wrap.querySelector('.tile');
+   const del=wrap.querySelector('.library-task-delete');
+   if(!row||!del)return;
+   let sx=0,sy=0,dx=0,drag=false,vertical=false,locked=false,suppressClick=false;
+   const start=e=>{
+     const t=e.touches?e.touches[0]:e;
+     sx=t.clientX;sy=t.clientY;dx=0;drag=true;vertical=false;locked=false;suppressClick=false;
+     row.classList.add('swiping');
    };
-   const end=()=>{if(!drag)return;drag=false;row.classList.remove('swiping');if(vertical){row.style.transform='translateX(0)';return}row.style.transform=dx<-38?'translateX(-74px)':'translateX(0)';};
-   row.addEventListener('touchstart',start,{passive:true});row.addEventListener('touchmove',move,{passive:false});row.addEventListener('touchend',end,{passive:true});row.addEventListener('touchcancel',end,{passive:true});
+   const move=e=>{
+     if(!drag)return;
+     const t=e.touches?e.touches[0]:e;
+     const mx=t.clientX-sx,my=t.clientY-sy;
+     if(!locked && Math.abs(my)>Math.abs(mx)+8){vertical=true;locked=true;row.style.transform='translateX(0)';return}
+     if(vertical)return;
+     if(!locked && Math.abs(mx)>8)locked=true;
+     if(mx>0)dx=0; else dx=Math.max(mx,-74);
+     if(Math.abs(mx)>Math.abs(my)+4){
+       if(e.cancelable)e.preventDefault();
+       if(Math.abs(mx)>18)suppressClick=true;
+     }
+     row.style.transform=`translateX(${dx}px)`;
+   };
+   const end=()=>{
+     if(!drag)return;
+     drag=false;row.classList.remove('swiping');
+     if(vertical){row.style.transform='translateX(0)';return}
+     if(dx<-38){
+       row.style.transform='translateX(-74px)';
+       suppressClick=true;
+     }else{
+       row.style.transform='translateX(0)';
+     }
+   };
+   const cancel=()=>{drag=false;vertical=false;row.classList.remove('swiping');row.style.transform='translateX(0)'};
+   row.addEventListener('click',e=>{
+     if(suppressClick){e.preventDefault();e.stopPropagation();suppressClick=false;}
+   },true);
+   del.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+   del.addEventListener('click',e=>{
+     e.preventDefault();e.stopPropagation();
+     const id=wrap.dataset.taskId;
+     if(id)deleteCustomTask(id);
+   });
+   wrap.addEventListener('touchstart',start,{passive:true});
+   wrap.addEventListener('touchmove',move,{passive:false});
+   wrap.addEventListener('touchend',end,{passive:true});
+   wrap.addEventListener('touchcancel',cancel,{passive:true});
  });
 }
+
 function deleteCustomTask(id){
  const t=customTasks.find(x=>x[0]===id); if(!t)return;
  customTasks=customTasks.filter(x=>x[0]!==id); saveCustomTasks();
