@@ -56,15 +56,18 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .day-summary .count{font-size:13px;color:var(--muted);font-weight:500;margin-left:6px}
 .added.collapsed{display:none}
 
-/* v13: solid color / touch palette */
+/* v15: refined iOS-style color picker */
 .color-card{grid-column:1/-1}
-.color-preview{height:74px;border-radius:14px;margin-bottom:10px;border:1px solid rgba(0,0,0,.08);position:relative;overflow:hidden}
-.color-preview span{position:absolute;left:12px;bottom:9px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.78);font-size:12px;font-weight:650;color:#222}
-.picker-sv{height:150px;border-radius:14px;position:relative;overflow:hidden;background:linear-gradient(to bottom,transparent,#000),linear-gradient(to right,#fff,transparent);touch-action:none;cursor:pointer}
-.picker-knob{position:absolute;width:22px;height:22px;border:3px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:none}
-.picker-hue{height:22px;border-radius:999px;margin-top:12px;background:linear-gradient(to right,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000);position:relative;touch-action:none}
-.hue-knob{position:absolute;top:50%;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:none}
-.color-code{font-size:13px;color:var(--muted);margin-top:9px;text-align:center;font-variant-numeric:tabular-nums}
+.color-preview{height:74px;border-radius:18px;margin-bottom:10px;border:1px solid rgba(0,0,0,.06);position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.24)}
+.color-preview span{position:absolute;left:12px;bottom:9px;padding:5px 9px;border-radius:10px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);font-size:12px;font-weight:650;color:#222}
+.color-panel{margin-top:10px;padding:15px 14px 13px;border:1px solid var(--line);background:var(--card);border-radius:20px}
+.color-panel p{margin:0 0 12px;font-size:15px;font-weight:650}
+.color-swatches{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:14px}
+.color-swatch{height:32px;border:0;border-radius:11px;padding:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);position:relative}
+.color-swatch.selected:after{content:"";position:absolute;inset:4px;border:2px solid rgba(255,255,255,.95);border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.picker-hue{height:18px;border-radius:999px;margin-top:4px;background:linear-gradient(90deg,#e98d9d 0%,#edaa72 12%,#e6c86e 24%,#9fbd83 36%,#72b9a7 48%,#75aeca 60%,#8d9ed1 72%,#aa91c9 84%,#d28cae 92%,#e98d9d 100%);position:relative;touch-action:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.hue-knob{position:absolute;top:50%;width:27px;height:27px;border-radius:50%;background:var(--card);border:3px solid rgba(255,255,255,.96);box-shadow:0 2px 8px rgba(0,0,0,.22);transform:translate(-50%,-50%);pointer-events:none}
+.color-hint{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
 </style>
 </head>
 <body><div id="app"></div>
@@ -118,7 +121,7 @@ const track=document.getElementById("track");
 if(!track)return;
 [...track.children].forEach((el,i)=>el.classList.toggle("under-pill",i===index));
 }
-function addTask(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id)){return}let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();render()}
+function addTask(id){let a=state.plans[state.date]||[];const existing=a.findIndex(x=>x.id===id);if(existing!==-1){a.splice(existing,1)}else{let t=tasks.find(x=>x[0]===id);if(!t)return;a.push({id,name:t[1],done:false})}state.plans[state.date]=a;save();render()}
 function toggleDayOpen(){state.dayOpen=!state.dayOpen;render()}
 function toggle(i){state.plans[state.date][i].done=!state.plans[state.date][i].done;save();render()}
 function updateDayHeaderOnly(){
@@ -181,15 +184,33 @@ track.style.transform=`translate3d(${base-n*w}px,0,0)`;
 const nextIndex=15+n;
 highlightCenter(nextIndex);
 setTimeout(()=>{
-/* Commit the date without replacing the whole DOM, so there is no white flash. */
-shift(n);
+/* Commit in-place: recycle one date node instead of rebuilding the calendar.
+   This keeps the page painted continuously and prevents the one-frame white flash. */
 const current=document.getElementById("track");
-if(current){
-  const m=metrics();
-  current.style.transition="none";
-  current.style.transform=`translate3d(${m.base}px,0,0)`;
-  highlightCenter(15);
+if(!current)return;
+let selected=dateFrom(state.date);
+selected.setDate(selected.getDate()+n);
+state.date=key(selected);
+save();
+swipeSound();
+updateDayHeaderOnly();
+
+if(n===1){
+  const first=current.firstElementChild;
+  if(first) current.removeChild(first);
+  const lastDate=new Date(selected.getFullYear(),selected.getMonth(),selected.getDate()+16);
+  current.insertAdjacentHTML("beforeend",`<div class="calendar-date" data-date="${key(lastDate)}"><span class="dow">${lastDate.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${lastDate.getDate()}</span></div>`);
+}else{
+  const last=current.lastElementChild;
+  if(last) current.removeChild(last);
+  const firstDate=new Date(selected.getFullYear(),selected.getMonth(),selected.getDate()-16);
+  current.insertAdjacentHTML("afterbegin",`<div class="calendar-date" data-date="${key(firstDate)}"><span class="dow">${firstDate.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${firstDate.getDate()}</span></div>`);
 }
+current.style.transition="none";
+const m=metrics();
+current.style.transform=`translate3d(${m.base}px,0,0)`;
+highlightCenter(15);
+attachCalendarClicksOnly();
 },225);
 },{passive:true});
 window.__ritmSwipeDx=0;
@@ -211,6 +232,7 @@ function openAddSheet(){const chosen=new Set((state.plans[state.date]||[]).map(x
 function addFromDetail(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id))return;let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();document.getElementById("addModal")?.remove();document.getElementById("dayScreen")?.remove();openDay(state.date)}
 function settings(){
 const hue=getHueFromHex(state.solidColor||"#d9d3d6");
+const palette=["#e98d9d","#eaa77a","#e4c56f","#a5bb80","#71b7a3","#74a9c6","#8f9ed0","#aa91c8","#c98cab","#8e6f83","#6f8792","#d38f76"];
 document.getElementById("modal").innerHTML=`<div class="sheet"><button class="close" onclick="closeM()">×</button><h3>Настройки</h3>
 <p>Акцент</p><div class="opts"><button class="opt ${state.accent==="green"?"selected":""}" onclick="setAccent('green')">Изумрудный</button><button class="opt ${state.accent==="pink"?"selected":""}" onclick="setAccent('pink')">Розовый</button></div>
 <p>Тема</p><div class="opts"><button class="opt ${state.theme==="day"?"selected":""}" onclick="setTheme('day')">День</button><button class="opt ${state.theme==="night"?"selected":""}" onclick="setTheme('night')">Ночь</button></div>
@@ -219,65 +241,39 @@ ${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?"select
 <button class="opt color-card ${state.bg==="color"?"selected":""}" onclick="setBg('color')"><div class="color-preview" style="background:${state.solidColor}"><span>Любой цвет</span></div>Однотонный фон</button>
 </div>
 <div class="color-panel">
-<p>Выбери цвет</p>
-<div class="picker-sv" id="svPicker" style="background-color:hsl(${hue},100%,50%)"><div class="picker-knob" id="svKnob"></div></div>
+<p>Цвет</p>
+<div class="color-swatches">${palette.map(c=>`<button class="color-swatch ${state.solidColor.toLowerCase()===c?"selected":""}" style="background:${c}" aria-label="Выбрать цвет" onclick="setSolidColor('${c}')"></button>`).join("")}</div>
 <div class="picker-hue" id="huePicker"><div class="hue-knob" id="hueKnob"></div></div>
-<div class="color-code" id="colorCode">${state.solidColor}</div>
+<div class="color-hint">Проведи пальцем по палитре, чтобы выбрать оттенок</div>
 </div>
 </div>`;
 document.getElementById("modal").style.display="flex";
-positionPicker(hue);
-attachColorPicker();
+positionHue(hue);attachHuePicker();
 }
-function getHueFromHex(hex){
-const {h}=hexToHsv(hex);return h;
-}
+function getHueFromHex(hex){return hexToHsv(hex).h}
 function hexToHsv(hex){
 hex=hex.replace("#","");let r=parseInt(hex.slice(0,2),16)/255,g=parseInt(hex.slice(2,4),16)/255,b=parseInt(hex.slice(4,6),16)/255;
-let max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,h=0;
-if(d){if(max===r)h=60*(((g-b)/d)%6);else if(max===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4);if(h<0)h+=360}
-return {h,s:max?d/max:0,v:max};
+let max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,h=0;if(d){if(max===r)h=60*(((g-b)/d)%6);else if(max===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4);if(h<0)h+=360}return {h,s:max?d/max:0,v:max}}
+function hsvToHex(h,s,v){let c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c,r=0,g=0,b=0;if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];return "#"+[r,g,b].map(q=>Math.round((q+m)*255).toString(16).padStart(2,"0")).join("")}
+function positionHue(h){const hk=document.getElementById("hueKnob");if(hk)hk.style.left=`${h/360*100}%`}
+function setSolidColor(c){state.solidColor=c;state.bg="color";save();settings();render()}
+function attachHuePicker(){
+const hu=document.getElementById("huePicker");if(!hu)return;let down=false;
+function point(e){const r=hu.getBoundingClientRect();return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))}
+function apply(x){
+const h=x*360;const c=hsvToHex(h,.42,.91);state.solidColor=c;state.bg="color";save();
+const hk=document.getElementById("hueKnob");if(hk)hk.style.left=`${x*100}%`;
+const prev=document.querySelector(".color-preview");if(prev)prev.style.background=c;
+const progress=document.querySelector(".progress");if(progress){progress.style.backgroundImage="none";progress.style.backgroundColor=c}
 }
-function hsvToHex(h,s,v){
-let c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c,r=0,g=0,b=0;
-if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];
-return "#"+[r,g,b].map(q=>Math.round((q+m)*255).toString(16).padStart(2,"0")).join("");
-}
-function positionPicker(h){
-const {s,v}=hexToHsv(state.solidColor||"#d9d3d6");
-const sv=document.getElementById("svPicker"),hk=document.getElementById("hueKnob"),sk=document.getElementById("svKnob");
-if(sv&&sk){sk.style.left=`${s*100}%`;sk.style.top=`${(1-v)*100}%`}
-if(hk)hk.style.left=`${h/360*100}%`;
-}
-function attachColorPicker(){
-const sv=document.getElementById("svPicker"),hu=document.getElementById("huePicker");
-if(!sv||!hu)return;
-let hue=getHueFromHex(state.solidColor||"#d9d3d6");
-function point(el,e){
-const r=el.getBoundingClientRect(),x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
-return {x,y};
-}
-function apply(h,s,v){
-state.solidColor=hsvToHex(h,s,v);state.bg="color";save();
-const svNow=document.getElementById("svPicker"),knob=document.getElementById("svKnob"),hk=document.getElementById("hueKnob"),code=document.getElementById("colorCode"),prev=document.querySelector(".color-preview");
-if(svNow)svNow.style.backgroundColor=`hsl(${h},100%,50%)`;
-if(knob){knob.style.left=`${s*100}%`;knob.style.top=`${(1-v)*100}%`}
-if(hk)hk.style.left=`${h/360*100}%`;
-if(code)code.textContent=state.solidColor;
-if(prev)prev.style.background=state.solidColor;
-const progress=document.querySelector(".progress");if(progress){progress.style.backgroundImage="none";progress.style.backgroundColor=state.solidColor}
-}
-let svDown=false,hDown=false;
-sv.addEventListener("pointerdown",e=>{svDown=true;sv.setPointerCapture(e.pointerId);let p=point(sv,e);apply(hue,p.x,1-p.y)});
-sv.addEventListener("pointermove",e=>{if(!svDown)return;let p=point(sv,e);apply(hue,p.x,1-p.y)});
-sv.addEventListener("pointerup",()=>svDown=false);
-hu.addEventListener("pointerdown",e=>{hDown=true;hu.setPointerCapture(e.pointerId);let p=point(hu,e);hue=p.x*360;apply(hue,...Object.values(hexToHsv(state.solidColor)).slice(1))});
-hu.addEventListener("pointermove",e=>{if(!hDown)return;let p=point(hu,e);hue=p.x*360;let hsv=hexToHsv(state.solidColor);apply(hue,hsv.s,hsv.v)});
-hu.addEventListener("pointerup",()=>hDown=false);
+hu.addEventListener("pointerdown",e=>{down=true;hu.setPointerCapture(e.pointerId);apply(point(e))});
+hu.addEventListener("pointermove",e=>{if(down)apply(point(e))});
+hu.addEventListener("pointerup",()=>{down=false;settings();render()});
+hu.addEventListener("pointercancel",()=>{down=false;settings();render()});
 }
 function setAccent(x){state.accent=x;save();settings();render()}
 function setTheme(x){state.theme=x;save();settings();render()}
 function setBg(x){state.bg=x;save();settings();render()}
-render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=13");
+render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=16");
 </script>
 </body></html>
