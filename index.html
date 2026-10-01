@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#f7f5f4">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Мой ритм</title>
+<style>
+:root{--accent:#2f7668;--pink:#e49bb5;--green:#2f7668;--bg:#f7f5f4;--text:#292729;--muted:#918d90;--card:#fff;--line:#e9e3e5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:540px;margin:auto;min-height:100vh;padding:18px 16px 108px}
+.top{display:flex;align-items:center;justify-content:space-between}.top h1{font-size:25px;line-height:1;margin:5px 0 18px;text-transform:uppercase;letter-spacing:.035em}.iconbtn{border:0;background:none;font-size:30px;line-height:1;color:var(--accent);padding:6px}
+
+/* FIXED CENTER PILL: dates move underneath it */
+.calendar{height:92px;margin:0 -2px 18px;position:relative;overflow:hidden;touch-action:none;user-select:none}
+.calendar-track{height:92px;display:flex;align-items:center;will-change:transform}
+.calendar-date{flex:0 0 calc(100% / 7);height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative}
+.calendar-date .dow{font-size:14px;color:var(--muted)}.calendar-date .num{font-size:27px;font-weight:650;line-height:1}
+.calendar-date.today .num{color:var(--accent)}
+.center-pill{position:absolute;z-index:2;left:50%;top:0;transform:translateX(-50%);width:calc((100% - 4px)/7);height:92px;border-radius:32px;background:var(--accent);pointer-events:none;box-shadow:0 5px 15px rgba(0,0,0,.08)}
+.center-pill .pill-dow,.center-pill .pill-num{position:absolute;left:50%;transform:translateX(-50%);color:#fff;white-space:nowrap}.center-pill .pill-dow{top:26px;font-size:14px;opacity:.84}.center-pill .pill-num{top:47px;font-size:27px;font-weight:650;line-height:1}
+.calendar.dragging .calendar-track{transition:none!important}.calendar.dragging .calendar-date{transition:none!important}
+
+.progress{height:181px;border-radius:30px;padding:21px 26px;color:#fff;margin-bottom:22px;position:relative;overflow:hidden;background:#bcb8b8 center/cover no-repeat;box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.progress:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.34),rgba(0,0,0,.08))}.progress>*{position:relative;z-index:1}
+.today-title{font-size:18px;font-weight:650;margin-bottom:8px}.pct{font-size:42px;font-weight:750;line-height:1}.sub{font-size:15px;margin-top:6px}.bar{height:8px;background:rgba(255,255,255,.32);border-radius:99px;margin-top:17px;overflow:hidden}.bar>i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:width .35s ease}
+
+h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02)}.left{display:flex;align-items:center;gap:12px}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
+
+.tasklib{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{appearance:none;width:100%;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px 12px;min-height:78px;display:flex;align-items:center;gap:11px;text-align:left;cursor:pointer;transition:transform .16s ease,background .2s ease,border-color .2s ease,box-shadow .2s ease}.tile:active{transform:scale(.965)}.tile.selected{background:var(--selected-bg);border-color:var(--accent);box-shadow:0 5px 16px var(--selected-shadow)}.tile.selected .name{color:var(--accent)}.tile .name{font-size:17px;font-weight:600;line-height:1.18;letter-spacing:-.01em;color:var(--text)}.tileemoji{width:46px;height:46px;display:grid;place-items:center;flex:0 0 46px;font-size:34px;line-height:1}.plus{margin-left:auto;color:var(--accent);font-size:18px;font-weight:700}.empty{color:var(--muted);font-size:14px;padding:4px 2px}
+
+.nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(508px,calc(100% - 24px));background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:28px;padding:8px;display:flex;justify-content:space-around;z-index:10;box-shadow:0 7px 25px rgba(0,0,0,.08)}.nav button{border:0;background:none;padding:9px 17px;color:var(--muted);font-size:13px}.nav .sel{color:var(--text);font-weight:700}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;align-items:flex-end;z-index:20}.sheet{background:var(--bg);width:100%;max-height:91vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto}.close{float:right;border:0;background:#eee;border-radius:50%;width:34px;height:34px;font-size:21px}.sheet h3{font-size:24px;margin:5px 0 17px;text-transform:capitalize}
+.month-head{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}.month-head div{text-align:center;color:var(--muted);font-size:12px}.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.mday{border:0;background:var(--card);border-radius:15px;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;color:var(--text)}.mday .count{font-size:9px;color:var(--muted);margin-top:3px}.mday.empty{background:transparent}.mday.current{background:var(--accent);color:#fff}.mday.today:not(.current){outline:2px solid var(--accent)}.mday.current .count{color:rgba(255,255,255,.8)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.opt{background:var(--card);border:2px solid transparent;border-radius:18px;padding:12px;text-align:left}.opt.selected{border-color:var(--accent)}.bgthumb{height:82px;border-radius:13px;margin-bottom:8px;background-size:cover;background-position:center}
+.dark{--bg:#171719;--text:#f4f1f2;--card:#242426;--line:#353438}.dark .nav{background:rgba(35,35,38,.94)}
+.day-screen{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;overflow:auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom))}.day-screen.open{display:block}.day-head{display:flex;align-items:center;gap:12px;margin-bottom:25px}.back{border:0;background:var(--card);width:42px;height:42px;border-radius:50%;font-size:25px;color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.06)}.day-title{font-size:26px;font-weight:700;letter-spacing:-.025em}.day-subtitle{font-size:14px;color:var(--muted);margin-top:3px}.detail-list{display:flex;flex-direction:column;gap:10px}.detail-empty{padding:55px 15px;text-align:center;color:var(--muted);font-size:16px}.detail-add{margin-top:18px;border:0;width:100%;height:54px;border-radius:18px;background:var(--accent);color:white;font-size:16px;font-weight:650}.add-sheet{background:var(--bg);width:100%;max-height:82vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto}.add-sheet h3{font-size:22px;margin:4px 0 15px}
+
+@keyframes pop{0%{transform:scale(.96)}55%{transform:scale(1.035)}100%{transform:scale(1)}}.just-added{animation:pop .32s ease}
+@media(max-width:370px){.calendar-date .dow{font-size:12px}.calendar-date .num{font-size:23px}.center-pill .pill-dow{font-size:12px}.center-pill .pill-num{font-size:23px}.tasklib{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div id="app"></div>
+<script>
+const tasks=[
+["breakfast","Завтрак","🍳"],["lunch","Обед","🥗"],["dinner","Ужин","🍽️"],["study","Учёба","📚"],["strength","Силовая","🏋️"],["cardio","Кардио","🏃"],["vacuum","Пылесос","🧹"],["laundry","Стирка","🧺"],["dryer","Разобрать сушилку","🧦"],["leo","Играть с Лео","🧸"],["readleo","Читать Лео","📖"],["mom","Позвонить маме","📞"],["bath","Ванна с кремом","🛁"],["cook","Готовка","🍳"]];
+const photos={
+mist:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=88",
+forest:"https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=88",
+sea:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=88",
+night:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=88"};
+const todayKey=key(new Date());
+let old=JSON.parse(localStorage.getItem("ritm9")||localStorage.getItem("ritm8")||localStorage.getItem("ritm7")||localStorage.getItem("ritm6")||"null");
+let state=old?{date:old.date||todayKey,plans:old.plans||{},accent:old.accent||"green",theme:old.theme||"day",bg:old.bg||"mist"}:{date:todayKey,plans:{},accent:"green",theme:"day",bg:"mist"};
+function key(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function dateFrom(s){let [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function pad(n){return String(n).padStart(2,"0")}
+function fmt(s){return dateFrom(s).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
+function save(){localStorage.setItem("ritm10",JSON.stringify(state))}
+function swipeSound(){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=900;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.035,c.currentTime+.008);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.07);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.08)}catch(e){}}
+function plural(n,a,b,c){let x=n%10,y=n%100;return x===1&&y!==11?a:x>=2&&x<=4&&(y<10||y>=20)?b:c}
+function render(){
+document.documentElement.style.setProperty("--accent",state.accent==="pink"?"var(--pink)":"var(--green)");
+document.documentElement.style.setProperty("--selected-bg",state.accent==="pink"?"rgba(228,155,181,.12)":"rgba(47,118,104,.12)");
+document.documentElement.style.setProperty("--selected-shadow",state.accent==="pink"?"rgba(228,155,181,.18)":"rgba(47,118,104,.18)");
+document.body.className=state.theme==="night"?"dark":"";
+const planned=state.plans[state.date]||[],done=planned.filter(x=>x.done).length,pct=planned.length?Math.round(done/planned.length*100):0,d=dateFrom(state.date);
+const dates=[];for(let i=-15;i<=15;i++)dates.push(new Date(d.getFullYear(),d.getMonth(),d.getDate()+i));
+const selected=new Set(planned.map(x=>x.id));
+document.getElementById("app").innerHTML=`<div class="app">
+<div class="top"><h1>${d.toLocaleDateString("ru-RU",{month:"long"})}</h1><button class="iconbtn" onclick="settings()">⚙︎</button></div>
+<div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill"><span class="pill-dow">${d.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="pill-num">${d.getDate()}</span></div></div>
+<div class="progress" style="background-image:url('${photos[state.bg]}')"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+<h2>Мои дела на ${fmt(state.date)}</h2><div class="added">${planned.length?planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><span class="check">${p.done?"✓":""}</span></div>`).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
+<h2>Добавить дело</h2><div class="tasklib">${tasks.map(t=>`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</div>
+</div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
+requestAnimationFrame(centerDates);
+attachSwipe();
+}
+function taskIcon(id){return (tasks.find(t=>t[0]===id)||tasks[0])[2]}
+function centerDates(){const cal=document.getElementById("calendar"),track=document.getElementById("track"),items=track.children;if(!items.length)return;const w=cal.clientWidth/7;track.style.transition="none";track.style.transform=`translate3d(${cal.clientWidth/2-w/2-(15*w)}px,0,0)`}
+function addTask(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id)){return}let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();render();setTimeout(()=>document.querySelector(".added")?.scrollIntoView({behavior:"smooth",block:"start"}),80)}
+function toggle(i){state.plans[state.date][i].done=!state.plans[state.date][i].done;save();render()}
+function shift(n){let d=dateFrom(state.date);d.setDate(d.getDate()+n);state.date=key(d);save();swipeSound();render()}
+function attachSwipe(){
+const cal=document.getElementById("calendar"),track=document.getElementById("track"),w=cal.clientWidth/7;let sx=0,sy=0,dx=0,drag=false;
+function base(){return cal.clientWidth/2-w/2-15*w}
+cal.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;drag=true;cal.classList.add("dragging");track.style.transition="none"},{passive:true});
+cal.addEventListener("touchmove",e=>{if(!drag)return;dx=e.touches[0].clientX-sx;let dy=e.touches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)){e.preventDefault();track.style.transform=`translate3d(${base()+dx}px,0,0)`}},{passive:false});
+cal.addEventListener("touchend",()=>{if(!drag)return;drag=false;cal.classList.remove("dragging");let n=dx<-28?1:dx>28?-1:0;track.style.transition="transform .26s cubic-bezier(.2,.78,.25,1)";if(n){track.style.transform=`translate3d(${base()+(-n*w)}px,0,0)`;setTimeout(()=>shift(n),235)}else{track.style.transform=`translate3d(${base()}px,0,0)`;setTimeout(()=>track.style.transition="",270)}},{passive:true});
+cal.querySelectorAll(".calendar-date").forEach(el=>el.addEventListener("click",()=>{if(Math.abs(dx)<8){state.date=el.dataset.date;save();render()}}));
+}
+function month(){
+let d=dateFrom(state.date),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),lead=(first.getDay()+6)%7,cells="";
+for(let i=0;i<lead;i++)cells+=`<div class="mday empty"></div>`;
+for(let n=1;n<=days;n++){let s=`${y}-${pad(m+1)}-${pad(n)}`,a=state.plans[s]||[];cells+=`<button class="mday ${s===state.date?"current":""} ${s===todayKey?"today":""}" onclick="openDay('${s}')">${n}<span class="count">${a.length?a.length+" дел.":""}</span></button>`}
+document.getElementById("modal").innerHTML=`<div class="sheet"><button class="close" onclick="closeM()">×</button><h3>${d.toLocaleDateString("ru-RU",{month:"long",year:"numeric"})}</h3><div class="month-head"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div><div class="month-grid">${cells}</div></div>`;document.getElementById("modal").style.display="flex"}
+function pick(s){state.date=s;save();closeM();render()}function closeM(){document.getElementById("modal").style.display="none"}
+
+function openDay(s){state.date=s;save();closeM();const d=dateFrom(s),a=state.plans[s]||[];document.body.insertAdjacentHTML("beforeend",`<div class="day-screen open" id="dayScreen"><div class="day-head"><button class="back" onclick="closeDay()">‹</button><div><div class="day-title">${d.toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</div><div class="day-subtitle">${a.length?a.length+" "+plural(a.length,"дело","дела","дел"):"Сегодня пока нет дел"}</div></div></div><div class="detail-list">${a.length?a.map((p,i)=>`<div class="detail-task ${p.done?"done":""}" onclick="detailToggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><span class="check">${p.done?"✓":""}</span></div>`).join(""):`<div class="detail-empty">Здесь пока пусто.<br>Добавь дела на этот день.</div>`}</div><button class="detail-add" onclick="openAddSheet()">＋ Добавить дело</button></div>`)}
+function closeDay(){document.getElementById("dayScreen")?.remove();render()}
+function detailToggle(i){state.plans[state.date][i].done=!state.plans[state.date][i].done;save();openDay(state.date)}
+function openAddSheet(){const chosen=new Set((state.plans[state.date]||[]).map(x=>x.id));const modal=document.createElement("div");modal.className="modal";modal.style.display="flex";modal.id="addModal";modal.innerHTML=`<div class="add-sheet"><button class="close" onclick="document.getElementById('addModal').remove()">×</button><h3>Добавить дело</h3><div class="tasklib">${tasks.map(t=>`<button class="tile ${chosen.has(t[0])?"selected":""}" onclick="addFromDetail('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${chosen.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</div></div>`;document.body.appendChild(modal)}
+function addFromDetail(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id))return;let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();document.getElementById("addModal")?.remove();document.getElementById("dayScreen")?.remove();openDay(state.date)}
+function settings(){
+document.getElementById("modal").innerHTML=`<div class="sheet"><button class="close" onclick="closeM()">×</button><h3>Настройки</h3><p>Акцент</p><div class="opts"><button class="opt ${state.accent==="green"?"selected":""}" onclick="setAccent('green')">Изумрудный</button><button class="opt ${state.accent==="pink"?"selected":""}" onclick="setAccent('pink')">Розовый</button></div><p>Тема</p><div class="opts"><button class="opt ${state.theme==="day"?"selected":""}" onclick="setTheme('day')">День</button><button class="opt ${state.theme==="night"?"selected":""}" onclick="setTheme('night')">Ночь</button></div><p>Фон карточки</p><div class="opts">${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?"selected":""}" onclick="setBg('${k}')"><div class="bgthumb" style="background-image:url('${v}')"></div>${{mist:"Туманное утро",forest:"Тихий лес",sea:"Спокойное море",night:"Ночное небо"}[k]}</button>`).join("")}</div></div>`;document.getElementById("modal").style.display="flex"}
+function setAccent(x){state.accent=x;save();settings();render()}function setTheme(x){state.theme=x;save();settings();render()}function setBg(x){state.bg=x;save();settings();render()}
+render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=12");
+</script>
+</body></html>
