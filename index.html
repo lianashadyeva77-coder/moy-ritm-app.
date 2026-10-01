@@ -135,10 +135,16 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .hue-knob{position:absolute;top:50%;width:27px;height:27px;border-radius:50%;background:var(--card);border:3px solid rgba(255,255,255,.96);box-shadow:0 2px 8px rgba(0,0,0,.22);transform:translate(-50%,-50%);pointer-events:none}
 .color-hint{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
 </style>
-</head>
+<style>
+.period-screen{position:fixed;inset:0;background:var(--bg);z-index:90;overflow:auto;padding:28px 20px 110px}
+.period-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}.period-head .back{border:0;background:var(--card);width:42px;height:42px;border-radius:50%;font-size:30px;color:var(--text)}
+.period-title{font-size:28px;font-weight:800;margin:0}.period-sub{color:var(--muted);margin:3px 0 0}
+.period-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.period-field{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px}.period-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.period-field input,.period-task{width:100%;border:0;background:transparent;font:inherit;color:var(--text);font-size:16px}
+.period-taskbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:14px}.period-summary{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;margin-top:12px}.period-big{font-size:42px;font-weight:850}.period-muted{color:var(--muted)}.period-list{margin-top:16px;display:grid;gap:8px}.period-row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);font-size:16px}.period-empty{padding:24px 4px;color:var(--muted);text-align:center}
+</style></head>
 <body><div id="app"></div>
 <script>
-// v38: библиотека дел полностью очищена от встроенных примеров.
+// v40: библиотека дел полностью очищена от встроенных примеров.
 // Все дела теперь создаёт пользователь сам; категории появляются только когда в них есть дела.
 const tasks=[];
 let customTasks=JSON.parse(localStorage.getItem("ritmCustomTasks")||"[]").map(t=>[t[0],t[1],t[2],t[3]||""]);
@@ -161,24 +167,26 @@ forest:"https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format
 sea:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=88",
 night:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=88"};
 const todayKey=key(new Date());
-let stored39=null;
+let stored40=null,stored39=null;
+try{stored40=JSON.parse(localStorage.getItem("ritmDataV40")||"null")}catch(e){}
 try{stored39=JSON.parse(localStorage.getItem("ritmDataV39")||"null")}catch(e){}
-let old=stored39?.state||JSON.parse(localStorage.getItem("ritm10")||localStorage.getItem("ritm9")||localStorage.getItem("ritm8")||localStorage.getItem("ritm7")||localStorage.getItem("ritm6")||"null");
-if(stored39?.customTasks&&Array.isArray(stored39.customTasks))customTasks=stored39.customTasks;
-if(stored39?.deletedTaskIds&&Array.isArray(stored39.deletedTaskIds))deletedTaskIds=stored39.deletedTaskIds;
-if(stored39?.categories&&Array.isArray(stored39.categories))taskCategories=stored39.categories;
+const stored=stored40||stored39;
+let old=stored?.state||JSON.parse(localStorage.getItem("ritm10")||localStorage.getItem("ritm9")||localStorage.getItem("ritm8")||localStorage.getItem("ritm7")||localStorage.getItem("ritm6")||"null");
+if(stored?.customTasks&&Array.isArray(stored.customTasks))customTasks=stored.customTasks;
+if(stored?.deletedTaskIds&&Array.isArray(stored.deletedTaskIds))deletedTaskIds=stored.deletedTaskIds;
+if(stored?.categories&&Array.isArray(stored.categories))taskCategories=stored.categories;
 let state=old?{date:old.date||todayKey,plans:old.plans||{},accent:old.accent||"green",theme:old.theme||"day",bg:old.bg||"mist",solidColor:old.solidColor||"#d9d3d6",dayOpen:false}:{date:todayKey,plans:{},accent:"green",theme:"day",bg:"mist",solidColor:"#d9d3d6",dayOpen:false};
 function key(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function dateFrom(s){let [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
 function pad(n){return String(n).padStart(2,"0")}
 function fmt(s){return dateFrom(s).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
-function snapshotData(){return {version:39,savedAt:new Date().toISOString(),state:{date:state.date,plans:state.plans,accent:state.accent,theme:state.theme,bg:state.bg,solidColor:state.solidColor,dayOpen:false},customTasks,deletedTaskIds,categories:taskCategories}}
+function snapshotData(){return {version:40,savedAt:new Date().toISOString(),state:{date:state.date,plans:state.plans,accent:state.accent,theme:state.theme,bg:state.bg,solidColor:state.solidColor,dayOpen:false},customTasks,deletedTaskIds,categories:taskCategories}}
 function persistData(){
  try{
-   const current=localStorage.getItem("ritmDataV39");
-   if(current)localStorage.setItem("ritmBackupV39",current);
+   const current=localStorage.getItem("ritmDataV40");
+   if(current)localStorage.setItem("ritmBackupV40",current);
    const snap=snapshotData(),json=JSON.stringify(snap);
-   localStorage.setItem("ritmDataV39",json);
+   localStorage.setItem("ritmDataV40",json);
    localStorage.setItem("ritm10",JSON.stringify(state));
    localStorage.setItem("ritmCustomTasks",JSON.stringify(customTasks));
    localStorage.setItem("ritmDeletedTasks",JSON.stringify(deletedTaskIds));
@@ -187,8 +195,8 @@ function persistData(){
 }
 function save(){persistData()}
 // v39: migrate the current state into a single durable snapshot. Never reset user data here.
-if(!localStorage.getItem("ritm39Migrated")){
-  localStorage.setItem("ritm39Migrated","1");
+if(!localStorage.getItem("ritm40Migrated")){
+  localStorage.setItem("ritm40Migrated","1");
   persistData();
 }
 function swipeSound(){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=900;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.035,c.currentTime+.008);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.07);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.08)}catch(e){}}
@@ -204,7 +212,7 @@ document.getElementById("app").innerHTML=`<div class="app">
 <div class="progress" style="${state.bg==="color"?"background-image:none;background-color:"+state.solidColor:"background-image:url('"+photos[state.bg]+"')"}" onclick="openTodayStats()" role="button" tabindex="0"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
 <button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>dayTaskMarkup(p,i)).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
 <h2>Добавить дело</h2><div class="tasklib">${Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>{const tile=`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`;return `<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" data-delete-library="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`;}).join("")}</section>`).join("")}<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button></div></div>
-</div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
+</div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="openPeriodStats()">Итоги</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
 requestAnimationFrame(()=>{centerDates();attachDayTaskSwipe(document.querySelector(".added"));attachLibraryTaskSwipe(document.querySelector(".tasklib"));});
 attachSwipe();
 }
@@ -232,6 +240,14 @@ if(sub)sub.textContent=`${done} из ${planned.length} выполнено`;
 if(bar)bar.style.width=`${pct}%`;
 if(summary){const c=summary.querySelector(".count");if(c)c.textContent=planned.length?planned.length:"нет";summary.classList.toggle("open",!!state.dayOpen)}
 }
+
+function refreshLibrary(){
+ const lib=document.querySelector(".tasklib"); if(!lib)return;
+ const selected=new Set((state.plans[state.date]||[]).map(x=>x.id));
+ lib.innerHTML=Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>{const tile=`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`;return `<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" data-delete-library="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 1 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`;}).join("")}</section>`).join("")+`<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button>`;
+ attachLibraryTaskSwipe(lib);
+}
+
 
 function syncSelectedTiles(){
 const selected=new Set((state.plans[state.date]||[]).map(x=>x.id));
@@ -676,6 +692,7 @@ if(fromDay){
   openAddSheet();
 }else{
   refreshTaskUI();
+  refreshLibrary();
   syncSelectedTiles();
   syncAddedList();
 }
@@ -753,15 +770,35 @@ function importData(){
 }
 function handleImportFile(e){
  const file=e.target.files?.[0];if(!file)return;
- const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!data||!data.state||!Array.isArray(data.customTasks))throw new Error();localStorage.setItem("ritmBackupV39",localStorage.getItem("ritmDataV39")||"");state={date:data.state.date||todayKey,plans:data.state.plans||{},accent:data.state.accent||"green",theme:data.state.theme||"day",bg:data.state.bg||"mist",solidColor:data.state.solidColor||"#d9d3d6",dayOpen:false};customTasks=data.customTasks||[];deletedTaskIds=data.deletedTaskIds||[];taskCategories=data.categories||[];persistData();document.getElementById("modal").style.display="none";render();alert("Данные восстановлены.");}catch(err){alert("Не удалось прочитать эту копию.");}finally{e.target.value=""}};reader.readAsText(file);
+ const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!data||!data.state||!Array.isArray(data.customTasks))throw new Error();localStorage.setItem("ritmBackupV40",localStorage.getItem("ritmDataV40")||"");state={date:data.state.date||todayKey,plans:data.state.plans||{},accent:data.state.accent||"green",theme:data.state.theme||"day",bg:data.state.bg||"mist",solidColor:data.state.solidColor||"#d9d3d6",dayOpen:false};customTasks=data.customTasks||[];deletedTaskIds=data.deletedTaskIds||[];taskCategories=data.categories||[];persistData();document.getElementById("modal").style.display="none";render();alert("Данные восстановлены.");}catch(err){alert("Не удалось прочитать эту копию.");}finally{e.target.value=""}};reader.readAsText(file);
 }
 function restoreBackup(){
- try{const raw=localStorage.getItem("ritmBackupV39");if(!raw){alert("Резервной копии пока нет.");return;}const data=JSON.parse(raw);if(!data.state)throw new Error();state={date:data.state.date||todayKey,plans:data.state.plans||{},accent:data.state.accent||"green",theme:data.state.theme||"day",bg:data.state.bg||"mist",solidColor:data.state.solidColor||"#d9d3d6",dayOpen:false};customTasks=data.customTasks||[];deletedTaskIds=data.deletedTaskIds||[];taskCategories=data.categories||[];persistData();document.getElementById("modal").style.display="none";render();alert("Последняя резервная копия восстановлена.");}catch(e){alert("Резервная копия недоступна.");}
+ try{const raw=localStorage.getItem("ritmBackupV40");if(!raw){alert("Резервной копии пока нет.");return;}const data=JSON.parse(raw);if(!data.state)throw new Error();state={date:data.state.date||todayKey,plans:data.state.plans||{},accent:data.state.accent||"green",theme:data.state.theme||"day",bg:data.state.bg||"mist",solidColor:data.state.solidColor||"#d9d3d6",dayOpen:false};customTasks=data.customTasks||[];deletedTaskIds=data.deletedTaskIds||[];taskCategories=data.categories||[];persistData();document.getElementById("modal").style.display="none";render();alert("Последняя резервная копия восстановлена.");}catch(e){alert("Резервная копия недоступна.");}
 }
 function saveNow(){persistData();updateDataStatus();}
-function updateDataStatus(){const el=document.getElementById("dataStatus");if(!el)return;try{const d=JSON.parse(localStorage.getItem("ritmDataV39")||"null");el.textContent=d?.savedAt?`Последнее сохранение: ${new Date(d.savedAt).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:"Последнее сохранение: ещё не создано"}catch(e){el.textContent="Сохранение включено"}}
+function updateDataStatus(){const el=document.getElementById("dataStatus");if(!el)return;try{const d=JSON.parse(localStorage.getItem("ritmDataV40")||"null");el.textContent=d?.savedAt?`Последнее сохранение: ${new Date(d.savedAt).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:"Последнее сохранение: ещё не создано"}catch(e){el.textContent="Сохранение включено"}}
 function clearPlans(){if(!confirm("Удалить все запланированные дела со всех дат? Библиотека и настройки останутся."))return;state.plans={};save();document.getElementById("modal").style.display="none";render();}
 
+function openPeriodStats(){
+ const tasks=allTasks();
+ const start=state.date,end=state.date;
+ const screen=document.createElement("div");screen.className="period-screen";screen.id="periodScreen";
+ const opts=tasks.map(t=>`<option value="${escapeHtml(t[0])}">${escapeHtml(t[2])} ${escapeHtml(t[1])}</option>`).join("");
+ screen.innerHTML=`<div class="period-head"><button class="back" onclick="document.getElementById('periodScreen')?.remove()">‹</button><div><h2 class="period-title">Итоги за период</h2><div class="period-sub">Выбери даты и дело</div></div></div><div class="period-fields"><div class="period-field"><label>С</label><input id="periodFrom" type="date" value="${start}"></div><div class="period-field"><label>По</label><input id="periodTo" type="date" value="${end}"></div></div><div class="period-taskbox"><label class="period-muted">Дело</label><select id="periodTask" class="period-task">${opts}</select></div><div id="periodResult"></div>`;
+ document.body.appendChild(screen);
+ if(tasks.length){document.getElementById("periodTask").value=tasks[0][0];}
+ ["periodFrom","periodTo","periodTask"].forEach(id=>document.getElementById(id)?.addEventListener("change",renderPeriodStats));
+ renderPeriodStats();
+}
+function renderPeriodStats(){
+ const out=document.getElementById("periodResult");if(!out)return;
+ const from=document.getElementById("periodFrom")?.value||todayKey,to=document.getElementById("periodTo")?.value||from,id=document.getElementById("periodTask")?.value;
+ if(from>to){out.innerHTML='<div class="period-summary period-empty">Дата «С» не может быть позже даты «По».</div>';return}
+ const task=taskById(id);if(!task){out.innerHTML='<div class="period-summary period-empty">Сначала создай дело в библиотеке.</div>';return}
+ const rows=[];let total=0;
+ Object.keys(state.plans||{}).sort().forEach(date=>{if(date<from||date>to)return;(state.plans[date]||[]).forEach(p=>{if(p.id===id&&p.done){total++;rows.push({date,time:p.time||"Время не указано"})}})});
+ out.innerHTML=`<div class="period-summary"><div class="period-muted">${escapeHtml(task[2])} ${escapeHtml(task[1])}</div><div class="period-big">${total}</div><div class="period-muted">раз ${total===1?"выполнено":"выполнено"} за выбранный период</div><div class="period-list">${rows.length?rows.map(r=>`<div class="period-row"><span>${escapeHtml(fmt(r.date))}</span><strong>${escapeHtml(r.time)}</strong></div>`).join(""):'<div class="period-empty">За этот период отмеченных выполнений нет.</div>'}</div></div>`;
+}
 function settings(){
 const hue=getHueFromHex(state.solidColor||"#d9d3d6");
 const palette=["#e98d9d","#eaa77a","#e4c56f","#a5bb80","#71b7a3","#74a9c6","#8f9ed0","#aa91c8","#c98cab","#8e6f83","#6f8792","#d38f76"];
@@ -821,6 +858,6 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden)persistData
 window.addEventListener("pagehide",()=>persistData());
 window.addEventListener("beforeunload",()=>persistData());
 persistData();
-applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=39");
+applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=40");
 </script>
 </body></html>
