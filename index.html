@@ -38,7 +38,7 @@ body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:54
 
 h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask-wrap{position:relative;overflow:hidden;border-radius:19px}.daytask{position:relative;z-index:2;background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02);transform:translateX(0);transition:transform .18s ease}.daytask.swiping{transition:none}.daytask-delete{position:absolute;inset:0;width:100%;background:#ececea;color:#ff3b30;border:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.daytask-delete svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.left{display:flex;align-items:center;gap:12px;min-width:0}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;flex:0 0 24px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
 
-.tasklib{display:grid;grid-template-columns:1fr;gap:10px}.library-task-wrap{position:relative;overflow:hidden;border-radius:20px;touch-action:pan-y;overscroll-behavior-x:none;-webkit-user-select:none;user-select:none}.library-task-wrap .tile{position:relative;z-index:2}.library-task-wrap.swiping .tile{transition:none}.library-task-delete{position:absolute;inset:0;width:100%;border:0;background:#ececea;color:#ff3b30;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.library-task-delete svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
+.tasklib{display:grid;grid-template-columns:1fr;gap:10px}.library-task-wrap{position:relative;overflow:hidden;border-radius:20px;touch-action:pan-y;overscroll-behavior-x:none;-webkit-user-select:none;user-select:none}.library-task-wrap .tile{position:relative;z-index:2}.library-task-wrap.swiping .tile{transition:none}.library-task-delete{position:absolute;inset:0;width:100%;border:0;background:#ececea;color:#ff3b30;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .12s ease}.library-task-wrap[data-open="1"] .library-task-delete{opacity:1;pointer-events:auto}.library-task-delete svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
 .tile{appearance:none;width:100%;height:82px;min-height:82px;max-height:82px;flex:0 0 82px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px 16px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
 .tile:active{transform:none}
 .tile.selected{background:var(--selected-bg);border-color:var(--accent);box-shadow:0 4px 14px var(--selected-shadow)}
@@ -50,7 +50,17 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 
 .nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(508px,calc(100% - 24px));background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:28px;padding:8px;display:flex;justify-content:space-around;z-index:10;box-shadow:0 7px 25px rgba(0,0,0,.08)}.nav button{border:0;background:none;padding:9px 17px;color:var(--muted);font-size:13px}.nav .sel{color:var(--text);font-weight:700}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;align-items:flex-end;z-index:80}.sheet{background:var(--bg);width:100%;max-height:91vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto}.close{float:right;border:0;background:#eee;border-radius:50%;width:34px;height:34px;font-size:21px}.sheet h3{font-size:24px;margin:5px 0 17px;text-transform:capitalize}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;align-items:flex-end;z-index:80}.sheet{background:var(--bg);width:100%;max-height:91vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto}
+.settings-block{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.settings-title{font-size:15px;font-weight:700;margin:0 0 10px}
+.settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.settings-action{border:1px solid var(--line);background:var(--card);border-radius:17px;padding:13px 12px;text-align:left;font-size:15px;font-weight:600}
+.settings-action small{display:block;color:var(--muted);font-size:12px;font-weight:500;margin-top:4px;line-height:1.3}
+.settings-danger{color:#ff3b30}
+.category-row{display:flex;gap:8px;margin:8px 0}.category-row input{flex:1;min-width:0;height:46px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:0 12px;font-size:16px;color:var(--text)}.category-row button{width:46px;height:46px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:24px}
+.category-list{display:flex;flex-wrap:wrap;gap:8px}.category-chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 10px;font-size:14px}.category-chip button{border:0;background:transparent;color:var(--muted);font-size:17px;padding:0}
+.data-status{color:var(--muted);font-size:12px;margin:8px 0 12px;line-height:1.4}
+.close{float:right;border:0;background:#eee;border-radius:50%;width:34px;height:34px;font-size:21px}.sheet h3{font-size:24px;margin:5px 0 17px;text-transform:capitalize}
 .month-trigger{cursor:pointer;user-select:none}
 .month-sheet-head{display:flex;align-items:center;gap:10px;margin:2px 0 18px}
 .month-sheet-head h3{flex:1;margin:0;text-align:center}
@@ -128,34 +138,59 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 </head>
 <body><div id="app"></div>
 <script>
-const tasks=[
-["breakfast","Завтрак","🍳","Еда"],["lunch","Обед","🥗","Еда"],["dinner","Ужин","🍽️","Еда"],["cook","Готовка","🍳","Еда"],
-["vacuum","Пылесос","🧹","Дом"],["strength","Силовая","🏋️","Спорт"],["cardio","Кардио","🏃","Спорт"],
-["leo","Играть с Лео","🧸","Ребёнок"],["readleo","Читать Лео","📖","Ребёнок"],
-["laundry","Стирка","🧺","Быт"],["dryer","Разобрать сушилку","🧦","Быт"],["bath","Ванна с кремом","🛁","Быт"],
-["study","Учёба","📚","Планы"],["mom","Позвонить маме","📞","Планы"]];
-let customTasks=JSON.parse(localStorage.getItem("ritmCustomTasks")||"[]").map(t=>[t[0],t[1],t[2],t[3]||"Планы"]);
-function allTasks(){return tasks.concat(customTasks)}
-const taskCategories=["Еда","Дом","Ребёнок","Хобби","Спорт","Быт","Планы"];
+// v38: библиотека дел полностью очищена от встроенных примеров.
+// Все дела теперь создаёт пользователь сам; категории появляются только когда в них есть дела.
+const tasks=[];
+let customTasks=JSON.parse(localStorage.getItem("ritmCustomTasks")||"[]").map(t=>[t[0],t[1],t[2],t[3]||""]);
+let deletedTaskIds=JSON.parse(localStorage.getItem("ritmDeletedTasks")||"[]");
+let taskCategories=JSON.parse(localStorage.getItem("ritmCategories")||"[]");
+if(!Array.isArray(taskCategories))taskCategories=[];
+customTasks.forEach(t=>{if(t[3]&&!taskCategories.includes(t[3]))taskCategories.push(t[3])});
+function allTasks(){return customTasks.filter(t=>!deletedTaskIds.includes(t[0]))}
 function categoryTasks(){
  const groups={}; taskCategories.forEach(c=>groups[c]=[]);
- allTasks().forEach(t=>{const c=t[3]&&taskCategories.includes(t[3])?t[3]:"Планы";groups[c].push(t)});
+ allTasks().forEach(t=>{const c=t[3]&&taskCategories.includes(t[3])?t[3]:""; if(c){groups[c].push(t)}});
  return groups;
 }
-function saveCustomTasks(){localStorage.setItem("ritmCustomTasks",JSON.stringify(customTasks))}
+function saveCustomTasks(){persistData()}
+function saveDeletedTasks(){persistData()}
+function saveCategories(){localStorage.setItem("ritmCategories",JSON.stringify(taskCategories));persistData()}
 const photos={
 mist:"https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1400&q=88",
 forest:"https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=88",
 sea:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=88",
 night:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=88"};
 const todayKey=key(new Date());
-let old=JSON.parse(localStorage.getItem("ritm9")||localStorage.getItem("ritm8")||localStorage.getItem("ritm7")||localStorage.getItem("ritm6")||"null");
+let stored39=null;
+try{stored39=JSON.parse(localStorage.getItem("ritmDataV39")||"null")}catch(e){}
+let old=stored39?.state||JSON.parse(localStorage.getItem("ritm10")||localStorage.getItem("ritm9")||localStorage.getItem("ritm8")||localStorage.getItem("ritm7")||localStorage.getItem("ritm6")||"null");
+if(stored39?.customTasks&&Array.isArray(stored39.customTasks))customTasks=stored39.customTasks;
+if(stored39?.deletedTaskIds&&Array.isArray(stored39.deletedTaskIds))deletedTaskIds=stored39.deletedTaskIds;
+if(stored39?.categories&&Array.isArray(stored39.categories))taskCategories=stored39.categories;
 let state=old?{date:old.date||todayKey,plans:old.plans||{},accent:old.accent||"green",theme:old.theme||"day",bg:old.bg||"mist",solidColor:old.solidColor||"#d9d3d6",dayOpen:false}:{date:todayKey,plans:{},accent:"green",theme:"day",bg:"mist",solidColor:"#d9d3d6",dayOpen:false};
 function key(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function dateFrom(s){let [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
 function pad(n){return String(n).padStart(2,"0")}
 function fmt(s){return dateFrom(s).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}
-function save(){localStorage.setItem("ritm10",JSON.stringify(state))}
+function snapshotData(){return {version:39,savedAt:new Date().toISOString(),state:{date:state.date,plans:state.plans,accent:state.accent,theme:state.theme,bg:state.bg,solidColor:state.solidColor,dayOpen:false},customTasks,deletedTaskIds,categories:taskCategories}}
+function persistData(){
+ try{
+   const current=localStorage.getItem("ritmDataV39");
+   if(current)localStorage.setItem("ritmBackupV39",current);
+   const snap=snapshotData(),json=JSON.stringify(snap);
+   localStorage.setItem("ritmDataV39",json);
+   localStorage.setItem("ritm10",JSON.stringify(state));
+   localStorage.setItem("ritmCustomTasks",JSON.stringify(customTasks));
+   localStorage.setItem("ritmDeletedTasks",JSON.stringify(deletedTaskIds));
+   localStorage.setItem("ritmCategories",JSON.stringify(taskCategories));
+ }catch(e){}
+}
+function save(){persistData()}
+// v39: migrate the current state into a single durable snapshot. Never reset user data here.
+if(!localStorage.getItem("ritm39Migrated")){
+  localStorage.setItem("ritm39Migrated","1");
+  persistData();
+}
 function swipeSound(){try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=900;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.035,c.currentTime+.008);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.07);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.08)}catch(e){}}
 function plural(n,a,b,c){let x=n%10,y=n%100;return x===1&&y!==11?a:x>=2&&x<=4&&(y<10||y>=20)?b:c}
 function render(){
@@ -168,7 +203,7 @@ document.getElementById("app").innerHTML=`<div class="app">
 <div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill" aria-hidden="true"></div></div>
 <div class="progress" style="${state.bg==="color"?"background-image:none;background-color:"+state.solidColor:"background-image:url('"+photos[state.bg]+"')"}" onclick="openTodayStats()" role="button" tabindex="0"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
 <button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>dayTaskMarkup(p,i)).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
-<h2>Добавить дело</h2><div class="tasklib">${Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>{const custom=t[0].startsWith("custom_");const tile=`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`;return custom?`<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" onclick="event.stopPropagation();deleteCustomTask('${t[0]}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`:tile;}).join("")}</section>`).join("")}<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button></div></div>
+<h2>Добавить дело</h2><div class="tasklib">${Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>{const tile=`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`;return `<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" data-delete-library="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`;}).join("")}</section>`).join("")}<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button></div></div>
 </div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
 requestAnimationFrame(()=>{centerDates();attachDayTaskSwipe(document.querySelector(".added"));attachLibraryTaskSwipe(document.querySelector(".tasklib"));});
 attachSwipe();
@@ -475,9 +510,8 @@ function closeDay(){document.getElementById("dayScreen")?.remove();render()}
 function detailToggle(i){const a=state.plans[state.date]||[];if(!a[i])return;a[i].done=!a[i].done;save();const screen=document.getElementById("dayScreen");if(screen){const row=screen.querySelectorAll(".detail-task")[i];if(row){row.classList.toggle("done",a[i].done);const c=row.querySelector(".check");if(c)c.textContent=a[i].done?"✓":""}}}
 function renderTaskButtons(chosen, handler){
  return Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>{
-   const custom=t[0].startsWith("custom_");
    const tile=`<button class="tile ${chosen.has(t[0])?"selected":""}" onclick="${handler}('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${chosen.has(t[0])?'<span class="plus">✓</span>':''}</button>`;
-   return custom?`<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" onclick="event.stopPropagation();deleteCustomTask('${t[0]}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`:tile;
+   return `<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" data-delete-library="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`;
  }).join("")}</section>`).join("");
 }
 function attachLibraryTaskSwipe(box){
@@ -493,6 +527,7 @@ function attachLibraryTaskSwipe(box){
      row.style.transition='transform .2s ease';
      row.style.transform='translate3d(0,0,0)';
      row.classList.remove('swiping');
+     wrap.dataset.open='0';
      dx=0; tracking=false; horizontal=false; moved=false; pointerId=null;
    };
 
@@ -501,6 +536,7 @@ function attachLibraryTaskSwipe(box){
        if(other!==wrap){
          const r=other.querySelector('.tile');
          if(r) r.style.transform='translate3d(0,0,0)';
+         other.dataset.open='0';
        }
      });
    };
@@ -583,19 +619,26 @@ function attachLibraryTaskSwipe(box){
    trash.addEventListener('click',e=>{
      e.preventDefault();
      e.stopPropagation();
-     deleteCustomTask(wrap.dataset.taskId);
+     e.stopImmediatePropagation();
+     deleteLibraryTask(wrap.dataset.taskId);
    });
  });
 }
-function deleteCustomTask(id){
- const t=customTasks.find(x=>x[0]===id); if(!t)return;
- customTasks=customTasks.filter(x=>x[0]!==id); saveCustomTasks();
- Object.keys(state.plans).forEach(date=>{state.plans[date]=(state.plans[date]||[]).filter(p=>p.id!==id)});
+function deleteLibraryTask(id){
+ const exists=allTasks().find(x=>x[0]===id);
+ if(!exists)return;
+ customTasks=customTasks.filter(x=>x[0]!==id);
+ saveCustomTasks();
+ Object.keys(state.plans||{}).forEach(date=>{
+   state.plans[date]=(state.plans[date]||[]).filter(p=>p.id!==id);
+ });
  save();
  const modal=document.getElementById('addModal');
- if(modal){const chosen=new Set((state.plans[state.date]||[]).map(x=>x.id));modal.querySelector('.add-sheet')?.replaceChildren(...[]);modal.remove();openAddSheet();}
+ if(modal){modal.remove();openAddSheet();return;}
  render();
 }
+function deleteCustomTask(id){deleteLibraryTask(id)}
+
 function openAddSheet(){
 const chosen=new Set((state.plans[state.date]||[]).map(x=>x.id));
 const modal=document.createElement("div");modal.className="modal";modal.style.display="flex";modal.id="addModal";
@@ -605,13 +648,15 @@ requestAnimationFrame(()=>attachLibraryTaskSwipe(modal.querySelector('.tasklib')
 }
 function openCustomTaskForm(fromDay=false){
 const modal=document.createElement("div");modal.className="modal";modal.style.display="flex";modal.id="customTaskModal";
-modal.innerHTML=`<div class="custom-form"><button class="close" onclick="document.getElementById('customTaskModal')?.remove()">×</button><h3>Новое дело</h3><p class="hint">Придумай название, смайлик и категорию — оно сохранится в твоей базе.</p><div class="custom-fields"><input id="customTaskName" class="custom-input" maxlength="40" placeholder="Например, Акробатика Лео" autocomplete="off"><input id="customTaskEmoji" class="custom-input emoji-input" maxlength="4" value="📝" aria-label="Смайлик"></div><select id="customTaskCategory" class="category-select" aria-label="Категория"><option>Еда</option><option>Дом</option><option>Ребёнок</option><option>Хобби</option><option>Спорт</option><option>Быт</option><option selected>Планы</option></select><button class="custom-save" type="button" onclick="saveCustomTask(${fromDay?'true':'false'})">Добавить дело</button><button class="custom-cancel" type="button" onclick="document.getElementById('customTaskModal')?.remove()">Отмена</button></div>`;
+const options=taskCategories.length?taskCategories.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join(""):``;
+modal.innerHTML=`<div class="custom-form"><button class="close" onclick="document.getElementById('customTaskModal')?.remove()">×</button><h3>Новое дело</h3><p class="hint">Название, смайлик и твоя категория. Дело сохранится в библиотеке.</p><div class="custom-fields"><input id="customTaskName" class="custom-input" maxlength="40" placeholder="Например, Акробатика Лео" autocomplete="off"><input id="customTaskEmoji" class="custom-input emoji-input" maxlength="4" value="📝" aria-label="Смайлик"></div>${taskCategories.length?`<select id="customTaskCategory" class="category-select" aria-label="Категория">${options}</select>`:`<div class="data-status">Сначала создай хотя бы одну категорию в Настройках → Мои категории.</div>`}<button class="custom-save" type="button" onclick="saveCustomTask(${fromDay?'true':'false'})" ${taskCategories.length?'':'disabled'}>Добавить дело</button><button class="custom-cancel" type="button" onclick="document.getElementById('customTaskModal')?.remove()">Отмена</button></div>`;
 document.body.appendChild(modal);setTimeout(()=>document.getElementById('customTaskName')?.focus(),50);
 }
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function saveCustomTask(fromDay=false){
 const name=(document.getElementById('customTaskName')?.value||'').trim();
 let emoji=(document.getElementById('customTaskEmoji')?.value||'📝').trim();
-const category=document.getElementById('customTaskCategory')?.value||"Планы";
+const category=document.getElementById('customTaskCategory')?.value||"";
 if(!name)return;
 if(!emoji)emoji='📝';
 const id='custom_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
@@ -619,7 +664,8 @@ const id='custom_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(
 // Новое дело создаётся только в постоянной библиотеке.
 // В сегодняшний день оно не добавляется автоматически.
 customTasks.push([id,name,emoji,category]);
-saveCustomTasks();
+if(category&&!taskCategories.includes(category))taskCategories.push(category);
+saveCustomTasks();saveCategories();
 
 document.getElementById('customTaskModal')?.remove();
 
@@ -676,6 +722,46 @@ function updateSettingsPreview(){
 const selectedBg=document.querySelectorAll(".sheet .opt");
 selectedBg.forEach(el=>el.classList.remove("selected"));
 }
+function renderCategoryManager(){
+ const box=document.getElementById("categoryManager");if(!box)return;
+ box.innerHTML=`<div class="category-list">${taskCategories.map((c,i)=>`<div class="category-chip"><span>${escapeHtml(c)}</span><button type="button" onclick="renameCategory(${i})" aria-label="Переименовать">✎</button><button type="button" onclick="deleteCategory(${i})" aria-label="Удалить">×</button></div>`).join("")||'<span class="data-status">Категорий пока нет.</span>'}</div>`;
+}
+function addCategory(){
+ const input=document.getElementById("newCategoryInput"),name=(input?.value||"").trim();
+ if(!name)return;
+ if(taskCategories.includes(name)){input.value="";return;}
+ taskCategories.push(name);saveCategories();renderCategoryManager();if(input)input.value="";
+}
+function renameCategory(i){
+ const old=taskCategories[i];if(!old)return;
+ const next=prompt("Новое название категории",old);
+ if(next===null)return; const name=next.trim();if(!name||taskCategories.includes(name))return;
+ customTasks=customTasks.map(t=>t[3]===old?[t[0],t[1],t[2],name]:t);taskCategories[i]=name;saveCategories();saveCustomTasks();renderCategoryManager();refreshTaskUI();syncSelectedTiles();syncAddedList();
+}
+function deleteCategory(i){
+ const name=taskCategories[i];if(!name)return;
+ const used=customTasks.some(t=>t[3]===name);
+ if(used){alert("Сначала перенеси или удали дела из этой категории.");return;}
+ taskCategories.splice(i,1);saveCategories();renderCategoryManager();refreshTaskUI();
+}
+function closeSettingsForAction(){document.getElementById("modal").style.display="none"}
+function exportData(){
+ persistData();const blob=new Blob([JSON.stringify(snapshotData(),null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`moy-ritm-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function importData(){
+ const input=document.getElementById("importDataInput");if(input)input.click();
+}
+function handleImportFile(e){
+ const file=e.target.files?.[0];if(!file)return;
+ const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!data||!data.state||!Array.isArray(data.customTasks))throw new Error();localStorage.setItem("ritmBackupV39",localStorage.getItem("ritmDataV39")||"");state={date:data.state.date||todayKey,plans:data.state.plans||{},accent:data.state.accent||"green",theme:data.state.theme||"day",bg:data.state.bg||"mist",solidColor:data.state.solidColor||"#d9d3d6",dayOpen:false};customTasks=data.customTasks||[];deletedTaskIds=data.deletedTaskIds||[];taskCategories=data.categories||[];persistData();document.getElementById("modal").style.display="none";render();alert("Данные восстановлены.");}catch(err){alert("Не удалось прочитать эту копию.");}finally{e.target.value=""}};reader.readAsText(file);
+}
+function restoreBackup(){
+ try{const raw=localStorage.getItem("ritmBackupV39");if(!raw){alert("Резервной копии пока нет.");return;}const data=JSON.parse(raw);if(!data.state)throw new Error();state={date:data.state.date||todayKey,plans:data.state.plans||{},accent:data.state.accent||"green",theme:data.state.theme||"day",bg:data.state.bg||"mist",solidColor:data.state.solidColor||"#d9d3d6",dayOpen:false};customTasks=data.customTasks||[];deletedTaskIds=data.deletedTaskIds||[];taskCategories=data.categories||[];persistData();document.getElementById("modal").style.display="none";render();alert("Последняя резервная копия восстановлена.");}catch(e){alert("Резервная копия недоступна.");}
+}
+function saveNow(){persistData();updateDataStatus();}
+function updateDataStatus(){const el=document.getElementById("dataStatus");if(!el)return;try{const d=JSON.parse(localStorage.getItem("ritmDataV39")||"null");el.textContent=d?.savedAt?`Последнее сохранение: ${new Date(d.savedAt).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:"Последнее сохранение: ещё не создано"}catch(e){el.textContent="Сохранение включено"}}
+function clearPlans(){if(!confirm("Удалить все запланированные дела со всех дат? Библиотека и настройки останутся."))return;state.plans={};save();document.getElementById("modal").style.display="none";render();}
+
 function settings(){
 const hue=getHueFromHex(state.solidColor||"#d9d3d6");
 const palette=["#e98d9d","#eaa77a","#e4c56f","#a5bb80","#71b7a3","#74a9c6","#8f9ed0","#aa91c8","#c98cab","#8e6f83","#6f8792","#d38f76"];
@@ -692,9 +778,12 @@ ${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?"select
 <div class="picker-hue" id="huePicker"><div class="hue-knob" id="hueKnob"></div></div>
 <div class="color-hint">Проведи пальцем по палитре, чтобы выбрать оттенок</div>
 </div>
+<div class="settings-block"><div class="settings-title">Мои категории</div><div class="category-row"><input id="newCategoryInput" maxlength="24" placeholder="Например, Здоровье"><button type="button" onclick="addCategory()">＋</button></div><div id="categoryManager"></div></div>
+<div class="settings-block"><div class="settings-title">Память и данные</div><div id="dataStatus" class="data-status"></div><div class="settings-actions"><button class="settings-action" onclick="saveNow()">💾 Сохранить сейчас<small>Записать всё в память приложения</small></button><button class="settings-action" onclick="exportData()">📤 Сохранить копию<small>Файл для восстановления</small></button><button class="settings-action" onclick="restoreBackup()">↩️ Последняя копия<small>Вернуть последнее сохранение</small></button><button class="settings-action" onclick="importData()">📥 Загрузить копию<small>Восстановить JSON-файл</small></button><button class="settings-action settings-danger" onclick="clearPlans()">Очистить планы<small>Удалит планы, но не библиотеку</small></button></div><input id="importDataInput" type="file" accept="application/json,.json" style="display:none" onchange="handleImportFile(event)"></div>
+<div class="settings-block"><div class="settings-title">О приложении</div><div class="data-status">«Мой ритм» · версия 39<br>Данные хранятся на этом устройстве.</div></div>
 </div>`;
 document.getElementById("modal").style.display="flex";
-positionHue(hue);attachHuePicker();
+positionHue(hue);attachHuePicker();renderCategoryManager();updateDataStatus();
 }
 function getHueFromHex(hex){return hexToHsv(hex).h}
 function hexToHsv(hex){
@@ -728,6 +817,10 @@ hu.addEventListener("pointercancel",()=>{down=false;updateSettingsUI()});
 function setAccent(x){state.accent=x;save();applyAppearance();updateSettingsUI();syncSelectedTiles()}
 function setTheme(x){state.theme=x;save();applyAppearance();updateSettingsUI()}
 function setBg(x){state.bg=x;save();applyAppearance();updateSettingsUI()}
-applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=32");
+document.addEventListener("visibilitychange",()=>{if(document.hidden)persistData()});
+window.addEventListener("pagehide",()=>persistData());
+window.addEventListener("beforeunload",()=>persistData());
+persistData();
+applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=39");
 </script>
 </body></html>
