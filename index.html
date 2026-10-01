@@ -36,9 +36,9 @@ body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:54
 .stats-task-list{margin-top:20px}.stats-task-list h3{font-size:18px;margin:0 0 10px}.stats-task{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}.stats-task .done-mark{margin-left:auto;color:var(--accent);font-weight:800}
 
 
-h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask-wrap{position:relative;overflow:hidden;border-radius:19px}.daytask{position:relative;z-index:2;background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02);transform:translateX(0);transition:transform .18s ease}.daytask.swiping{transition:none}.daytask-delete{position:absolute;inset:0 0 0 auto;width:74px;background:#d95c62;color:#fff;border:0;display:grid;place-items:center;font-size:24px;z-index:1;cursor:pointer}.daytask-delete span{font-size:24px}.left{display:flex;align-items:center;gap:12px;min-width:0}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;flex:0 0 24px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
+h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask-wrap{position:relative;overflow:hidden;border-radius:19px}.daytask{position:relative;z-index:2;background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02);transform:translateX(0);transition:transform .18s ease}.daytask.swiping{transition:none}.daytask-delete{position:absolute;inset:0;width:100%;background:#ececea;color:#ff3b30;border:0;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.daytask-delete svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.left{display:flex;align-items:center;gap:12px;min-width:0}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;flex:0 0 24px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
 
-.tasklib{display:grid;grid-template-columns:1fr;gap:10px}.library-task-wrap{position:relative;overflow:hidden;border-radius:20px}.library-task-wrap .tile{position:relative;z-index:2}.library-task-wrap.swiping .tile{transition:none}.library-task-delete{position:absolute;inset:0 0 0 auto;width:74px;border:0;background:var(--selected-bg);color:var(--accent);display:grid;place-items:center;z-index:1;cursor:pointer}.library-task-delete svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
+.tasklib{display:grid;grid-template-columns:1fr;gap:10px}.library-task-wrap{position:relative;overflow:hidden;border-radius:20px;touch-action:pan-y}.library-task-wrap .tile{position:relative;z-index:2}.library-task-wrap.swiping .tile{transition:none}.library-task-delete{position:absolute;inset:0;width:100%;border:0;background:#ececea;color:#ff3b30;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;z-index:1;cursor:pointer}.library-task-delete svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
 .tile{appearance:none;width:100%;height:82px;min-height:82px;max-height:82px;flex:0 0 82px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px 16px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
 .tile:active{transform:none}
 .tile.selected{background:var(--selected-bg);border-color:var(--accent);box-shadow:0 4px 14px var(--selected-shadow)}
@@ -168,7 +168,7 @@ document.getElementById("app").innerHTML=`<div class="app">
 <div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill" aria-hidden="true"></div></div>
 <div class="progress" style="${state.bg==="color"?"background-image:none;background-color:"+state.solidColor:"background-image:url('"+photos[state.bg]+"')"}" onclick="openTodayStats()" role="button" tabindex="0"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
 <button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>dayTaskMarkup(p,i)).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
-<h2>Добавить дело</h2><div class="tasklib">${Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</section>`).join("")}<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button></div>
+<h2>Добавить дело</h2><div class="tasklib">${Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>{const custom=t[0].startsWith("custom_");const tile=`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`;return custom?`<div class="library-task-wrap" data-task-id="${t[0]}">${tile}<button class="library-task-delete" type="button" aria-label="Удалить дело из библиотеки" onclick="event.stopPropagation();deleteCustomTask('${t[0]}')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button></div>`:tile;}).join("")}</section>`).join("")}<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button></div></div>
 </div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
 requestAnimationFrame(()=>{centerDates();attachDayTaskSwipe(document.querySelector(".added"));attachLibraryTaskSwipe(document.querySelector(".tasklib"));});
 attachSwipe();
@@ -224,7 +224,7 @@ attachDayTaskSwipe(box);
 
 function dayTaskMarkup(p,i){
 return `<div class="daytask-wrap" data-index="${i}">
-<button class="daytask-delete" type="button" aria-label="Убрать из сегодняшних дел" onclick="event.stopPropagation();removeFromToday(${i})"><span>🗑️</span></button>
+<button class="daytask-delete" type="button" aria-label="Убрать из сегодняшних дел" onclick="event.stopPropagation();removeFromToday(${i})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M7 7l.8 12.2A1.5 1.5 0 0 0 9.3 20.5h5.4a1.5 1.5 0 0 0 1.5-1.3L17 7"/><path d="M10 11v5.5M14 11v5.5"/></svg></button>
 <div class="daytask ${p.done?"done":""}" onclick="toggle(${i})">
 <div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div>
 <div class="time-row">${p.time?`<span class="time-btn set">${p.time}</span>`:""}<span class="check">${p.done?"✓":""}</span></div>
@@ -484,56 +484,67 @@ function attachLibraryTaskSwipe(box){
  if(!box)return;
  box.querySelectorAll('.library-task-wrap').forEach(wrap=>{
    const row=wrap.querySelector('.tile');
-   const del=wrap.querySelector('.library-task-delete');
-   if(!row||!del)return;
-   let sx=0,sy=0,dx=0,drag=false,vertical=false,locked=false,suppressClick=false;
+   const trash=wrap.querySelector('.library-task-delete');
+   if(!row||!trash)return;
+   let sx=0,sy=0,dx=0,tracking=false,horizontal=false,moved=false,suppressClick=false;
+   const reset=()=>{
+     row.style.transition='transform .2s ease';
+     row.style.transform='translate3d(0,0,0)';
+     row.classList.remove('swiping');
+     dx=0; tracking=false; horizontal=false; moved=false;
+   };
    const start=e=>{
      const t=e.touches?e.touches[0]:e;
-     sx=t.clientX;sy=t.clientY;dx=0;drag=true;vertical=false;locked=false;suppressClick=false;
-     row.classList.add('swiping');
+     sx=t.clientX; sy=t.clientY; dx=0; tracking=true; horizontal=false; moved=false;
+     row.style.transition='none'; row.classList.add('swiping');
    };
    const move=e=>{
-     if(!drag)return;
+     if(!tracking)return;
      const t=e.touches?e.touches[0]:e;
-     const mx=t.clientX-sx,my=t.clientY-sy;
-     if(!locked && Math.abs(my)>Math.abs(mx)+8){vertical=true;locked=true;row.style.transform='translateX(0)';return}
-     if(vertical)return;
-     if(!locked && Math.abs(mx)>8)locked=true;
-     if(mx>0)dx=0; else dx=Math.max(mx,-74);
-     if(Math.abs(mx)>Math.abs(my)+4){
-       if(e.cancelable)e.preventDefault();
-       if(Math.abs(mx)>18)suppressClick=true;
+     const mx=t.clientX-sx, my=t.clientY-sy;
+     if(!horizontal){
+       if(Math.abs(my)>Math.abs(mx)+8){ tracking=false; reset(); return; }
+       if(Math.abs(mx)>10) horizontal=true;
      }
-     row.style.transform=`translateX(${dx}px)`;
+     if(!horizontal)return;
+     if(e.cancelable)e.preventDefault();
+     moved=true;
+     dx=Math.max(-82,Math.min(0,mx));
+     row.style.transform=`translate3d(${dx}px,0,0)`;
    };
    const end=()=>{
-     if(!drag)return;
-     drag=false;row.classList.remove('swiping');
-     if(vertical){row.style.transform='translateX(0)';return}
-     if(dx<-38){
-       row.style.transform='translateX(-74px)';
+     if(!tracking && !moved)return;
+     tracking=false;
+     row.classList.remove('swiping');
+     if(horizontal && dx<-42){
+       row.style.transition='transform .18s ease';
+       row.style.transform='translate3d(-82px,0,0)';
        suppressClick=true;
      }else{
-       row.style.transform='translateX(0)';
+       row.style.transition='transform .18s ease';
+       row.style.transform='translate3d(0,0,0)';
+       if(moved)suppressClick=true;
      }
+     horizontal=false;
    };
-   const cancel=()=>{drag=false;vertical=false;row.classList.remove('swiping');row.style.transform='translateX(0)'};
-   row.addEventListener('click',e=>{
-     if(suppressClick){e.preventDefault();e.stopPropagation();suppressClick=false;}
+   const cancel=()=>{tracking=false;horizontal=false;moved=false;row.style.transition='transform .18s ease';row.style.transform='translate3d(0,0,0)';row.classList.remove('swiping')};
+   // Capture the click before the button's inline onclick, so a swipe never accidentally adds/completes the task.
+   wrap.addEventListener('click',e=>{
+     if(suppressClick){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();suppressClick=false;}
    },true);
-   del.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
-   del.addEventListener('click',e=>{
-     e.preventDefault();e.stopPropagation();
-     const id=wrap.dataset.taskId;
-     if(id)deleteCustomTask(id);
-   });
-   wrap.addEventListener('touchstart',start,{passive:true});
+   // Close an open swipe when the user taps another library card.
+   wrap.addEventListener('touchstart',e=>{
+     box.querySelectorAll('.library-task-wrap').forEach(other=>{
+       if(other!==wrap){const r=other.querySelector('.tile');if(r)r.style.transform='translate3d(0,0,0)';}
+     });
+     start(e);
+   },{passive:true});
    wrap.addEventListener('touchmove',move,{passive:false});
    wrap.addEventListener('touchend',end,{passive:true});
    wrap.addEventListener('touchcancel',cancel,{passive:true});
+   trash.addEventListener('click',e=>{e.stopPropagation();});
  });
 }
-
 function deleteCustomTask(id){
  const t=customTasks.find(x=>x[0]===id); if(!t)return;
  customTasks=customTasks.filter(x=>x[0]!==id); saveCustomTasks();
@@ -675,6 +686,6 @@ hu.addEventListener("pointercancel",()=>{down=false;updateSettingsUI()});
 function setAccent(x){state.accent=x;save();applyAppearance();updateSettingsUI();syncSelectedTiles()}
 function setTheme(x){state.theme=x;save();applyAppearance();updateSettingsUI()}
 function setBg(x){state.bg=x;save();applyAppearance();updateSettingsUI()}
-applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=20");
+applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=32");
 </script>
 </body></html>
