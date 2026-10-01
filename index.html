@@ -41,6 +41,30 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 
 @keyframes pop{0%{transform:scale(.96)}55%{transform:scale(1.035)}100%{transform:scale(1)}}.just-added{animation:pop .32s ease}
 @media(max-width:370px){.calendar-date .dow{font-size:12px}.calendar-date .num{font-size:23px}.center-pill .pill-dow{font-size:12px}.center-pill .pill-num{font-size:23px}.tasklib{grid-template-columns:1fr}}
+
+/* v13: dates slide ABOVE the fixed pill */
+.calendar-track{position:relative;z-index:3}
+.center-pill{z-index:1}
+.calendar-date .dow,.calendar-date .num{transition:color .06s linear}
+.calendar-date.under-pill .dow,.calendar-date.under-pill .num{color:#fff!important}
+.calendar-date.under-pill{z-index:4}
+
+/* v13: compact collapsible day section */
+.day-summary{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:4px 2px 10px;text-align:left;font-size:19px;font-weight:700}
+.day-summary .chev{font-size:18px;color:var(--muted);transition:transform .2s ease}
+.day-summary.open .chev{transform:rotate(180deg)}
+.day-summary .count{font-size:13px;color:var(--muted);font-weight:500;margin-left:6px}
+.added.collapsed{display:none}
+
+/* v13: solid color / touch palette */
+.color-card{grid-column:1/-1}
+.color-preview{height:74px;border-radius:14px;margin-bottom:10px;border:1px solid rgba(0,0,0,.08);position:relative;overflow:hidden}
+.color-preview span{position:absolute;left:12px;bottom:9px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.78);font-size:12px;font-weight:650;color:#222}
+.picker-sv{height:150px;border-radius:14px;position:relative;overflow:hidden;background:linear-gradient(to bottom,transparent,#000),linear-gradient(to right,#fff,transparent);touch-action:none;cursor:pointer}
+.picker-knob{position:absolute;width:22px;height:22px;border:3px solid #fff;border-radius:50%;box-shadow:0 1px 5px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:none}
+.picker-hue{height:22px;border-radius:999px;margin-top:12px;background:linear-gradient(to right,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000);position:relative;touch-action:none}
+.hue-knob{position:absolute;top:50%;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:none}
+.color-code{font-size:13px;color:var(--muted);margin-top:9px;text-align:center;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body><div id="app"></div>
@@ -54,7 +78,7 @@ sea:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fi
 night:"https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=88"};
 const todayKey=key(new Date());
 let old=JSON.parse(localStorage.getItem("ritm9")||localStorage.getItem("ritm8")||localStorage.getItem("ritm7")||localStorage.getItem("ritm6")||"null");
-let state=old?{date:old.date||todayKey,plans:old.plans||{},accent:old.accent||"green",theme:old.theme||"day",bg:old.bg||"mist"}:{date:todayKey,plans:{},accent:"green",theme:"day",bg:"mist"};
+let state=old?{date:old.date||todayKey,plans:old.plans||{},accent:old.accent||"green",theme:old.theme||"day",bg:old.bg||"mist",solidColor:old.solidColor||"#d9d3d6",dayOpen:false}:{date:todayKey,plans:{},accent:"green",theme:"day",bg:"mist",solidColor:"#d9d3d6",dayOpen:false};
 function key(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function dateFrom(s){let [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
 function pad(n){return String(n).padStart(2,"0")}
@@ -72,26 +96,106 @@ const dates=[];for(let i=-15;i<=15;i++)dates.push(new Date(d.getFullYear(),d.get
 const selected=new Set(planned.map(x=>x.id));
 document.getElementById("app").innerHTML=`<div class="app">
 <div class="top"><h1>${d.toLocaleDateString("ru-RU",{month:"long"})}</h1><button class="iconbtn" onclick="settings()">⚙︎</button></div>
-<div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill"><span class="pill-dow">${d.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="pill-num">${d.getDate()}</span></div></div>
-<div class="progress" style="background-image:url('${photos[state.bg]}')"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
-<h2>Мои дела на ${fmt(state.date)}</h2><div class="added">${planned.length?planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><span class="check">${p.done?"✓":""}</span></div>`).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
+<div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill" aria-hidden="true"></div></div>
+<div class="progress" style="${state.bg==="color"?"background-image:none;background-color:"+state.solidColor:"background-image:url('"+photos[state.bg]+"')"}"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+<button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><span class="check">${p.done?"✓":""}</span></div>`).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
 <h2>Добавить дело</h2><div class="tasklib">${tasks.map(t=>`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</div>
 </div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
 requestAnimationFrame(centerDates);
 attachSwipe();
 }
 function taskIcon(id){return (tasks.find(t=>t[0]===id)||tasks[0])[2]}
-function centerDates(){const cal=document.getElementById("calendar"),track=document.getElementById("track"),items=track.children;if(!items.length)return;const w=cal.clientWidth/7;track.style.transition="none";track.style.transform=`translate3d(${cal.clientWidth/2-w/2-(15*w)}px,0,0)`}
-function addTask(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id)){return}let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();render();setTimeout(()=>document.querySelector(".added")?.scrollIntoView({behavior:"smooth",block:"start"}),80)}
+function centerDates(){
+const cal=document.getElementById("calendar"),track=document.getElementById("track");
+if(!track)return;
+const w=cal.clientWidth/7;
+track.style.transition="none";
+track.style.transform=`translate3d(${cal.clientWidth/2-w/2-(15*w)}px,0,0)`;
+highlightCenter(15);
+}
+function highlightCenter(index){
+const track=document.getElementById("track");
+if(!track)return;
+[...track.children].forEach((el,i)=>el.classList.toggle("under-pill",i===index));
+}
+function addTask(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id)){return}let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();render()}
+function toggleDayOpen(){state.dayOpen=!state.dayOpen;render()}
 function toggle(i){state.plans[state.date][i].done=!state.plans[state.date][i].done;save();render()}
-function shift(n){let d=dateFrom(state.date);d.setDate(d.getDate()+n);state.date=key(d);save();swipeSound();render()}
+function updateDayHeaderOnly(){
+const d=dateFrom(state.date),planned=state.plans[state.date]||[],done=planned.filter(x=>x.done).length,pct=planned.length?Math.round(done/planned.length*100):0;
+const title=document.querySelector(".top h1"),progress=document.querySelector(".progress"),today=document.querySelector(".today-title"),pctEl=document.querySelector(".pct"),sub=document.querySelector(".sub"),bar=document.querySelector(".bar>i"),summary=document.querySelector(".day-summary"),added=document.querySelector(".added");
+if(title)title.textContent=d.toLocaleDateString("ru-RU",{month:"long"});
+if(progress)progress.style.backgroundImage=state.bg==="color"?"none":`url('${photos[state.bg]}')`,progress.style.backgroundColor=state.bg==="color"?state.solidColor:"";
+if(today)today.textContent=`Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}`;
+if(pctEl)pctEl.textContent=`${pct}%`;
+if(sub)sub.textContent=`${done} из ${planned.length} выполнено`;
+if(bar)bar.style.width=`${pct}%`;
+if(summary)summary.innerHTML=`<span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span>`;
+if(added)added.innerHTML=planned.length?planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><span class="check">${p.done?"✓":""}</span></div>`).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`;
+}
+function refreshCalendarOnly(){
+const d=dateFrom(state.date),track=document.getElementById("track");
+if(!track)return;
+const dates=[];for(let i=-15;i<=15;i++)dates.push(new Date(d.getFullYear(),d.getMonth(),d.getDate()+i));
+track.innerHTML=dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("");
+track.style.transition="none";
+requestAnimationFrame(()=>{centerDates();attachCalendarClicksOnly()});
+}
+function attachCalendarClicksOnly(){
+const cal=document.getElementById("calendar");
+if(!cal)return;
+cal.querySelectorAll(".calendar-date").forEach(el=>el.addEventListener("click",()=>{
+if(Math.abs(window.__ritmSwipeDx||0)<8){state.date=el.dataset.date;save();render()}
+}));
+}
+function shift(n){
+let d=dateFrom(state.date);d.setDate(d.getDate()+n);state.date=key(d);save();swipeSound();updateDayHeaderOnly();refreshCalendarOnly();
+}
 function attachSwipe(){
-const cal=document.getElementById("calendar"),track=document.getElementById("track"),w=cal.clientWidth/7;let sx=0,sy=0,dx=0,drag=false;
-function base(){return cal.clientWidth/2-w/2-15*w}
-cal.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;drag=true;cal.classList.add("dragging");track.style.transition="none"},{passive:true});
-cal.addEventListener("touchmove",e=>{if(!drag)return;dx=e.touches[0].clientX-sx;let dy=e.touches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy)){e.preventDefault();track.style.transform=`translate3d(${base()+dx}px,0,0)`}},{passive:false});
-cal.addEventListener("touchend",()=>{if(!drag)return;drag=false;cal.classList.remove("dragging");let n=dx<-28?1:dx>28?-1:0;track.style.transition="transform .26s cubic-bezier(.2,.78,.25,1)";if(n){track.style.transform=`translate3d(${base()+(-n*w)}px,0,0)`;setTimeout(()=>shift(n),235)}else{track.style.transform=`translate3d(${base()}px,0,0)`;setTimeout(()=>track.style.transition="",270)}},{passive:true});
-cal.querySelectorAll(".calendar-date").forEach(el=>el.addEventListener("click",()=>{if(Math.abs(dx)<8){state.date=el.dataset.date;save();render()}}));
+const cal=document.getElementById("calendar"),track=document.getElementById("track");
+if(!cal||!track)return;
+let sx=0,sy=0,dx=0,drag=false,startIndex=15;
+function metrics(){return {w:cal.clientWidth/7,base:cal.clientWidth/2-(cal.clientWidth/7)/2-15*(cal.clientWidth/7)}}
+function updateDrag(){
+const {w,base}=metrics();
+track.style.transform=`translate3d(${base+dx}px,0,0)`;
+let idx=Math.max(0,Math.min(track.children.length-1,15-Math.round(dx/w)));
+highlightCenter(idx);
+}
+cal.addEventListener("touchstart",e=>{
+sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;window.__ritmSwipeDx=0;drag=true;startIndex=15;
+cal.classList.add("dragging");track.style.transition="none";
+},{passive:true});
+cal.addEventListener("touchmove",e=>{
+if(!drag)return;
+dx=e.touches[0].clientX-sx;window.__ritmSwipeDx=dx;let dy=e.touches[0].clientY-sy;
+if(Math.abs(dx)>Math.abs(dy)){e.preventDefault();updateDrag()}
+},{passive:false});
+cal.addEventListener("touchend",()=>{
+if(!drag)return;drag=false;window.__ritmSwipeDx=dx;cal.classList.remove("dragging");
+const {w,base}=metrics();
+let n=dx<-w*.32?1:dx>w*.32?-1:0;
+if(!n){track.style.transition="transform .18s ease-out";track.style.transform=`translate3d(${base}px,0,0)`;highlightCenter(15);return}
+track.style.transition="transform .22s cubic-bezier(.2,.78,.25,1)";
+track.style.transform=`translate3d(${base-n*w}px,0,0)`;
+const nextIndex=15+n;
+highlightCenter(nextIndex);
+setTimeout(()=>{
+/* Commit the date without replacing the whole DOM, so there is no white flash. */
+shift(n);
+const current=document.getElementById("track");
+if(current){
+  const m=metrics();
+  current.style.transition="none";
+  current.style.transform=`translate3d(${m.base}px,0,0)`;
+  highlightCenter(15);
+}
+},225);
+},{passive:true});
+window.__ritmSwipeDx=0;
+cal.querySelectorAll(".calendar-date").forEach(el=>el.addEventListener("click",()=>{
+if(Math.abs(window.__ritmSwipeDx)<8){state.date=el.dataset.date;save();render()}
+}));
 }
 function month(){
 let d=dateFrom(state.date),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),lead=(first.getDay()+6)%7,cells="";
@@ -106,8 +210,74 @@ function detailToggle(i){state.plans[state.date][i].done=!state.plans[state.date
 function openAddSheet(){const chosen=new Set((state.plans[state.date]||[]).map(x=>x.id));const modal=document.createElement("div");modal.className="modal";modal.style.display="flex";modal.id="addModal";modal.innerHTML=`<div class="add-sheet"><button class="close" onclick="document.getElementById('addModal').remove()">×</button><h3>Добавить дело</h3><div class="tasklib">${tasks.map(t=>`<button class="tile ${chosen.has(t[0])?"selected":""}" onclick="addFromDetail('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${chosen.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</div></div>`;document.body.appendChild(modal)}
 function addFromDetail(id){let a=state.plans[state.date]||[];if(a.some(x=>x.id===id))return;let t=tasks.find(x=>x[0]===id);a.push({id,name:t[1],done:false});state.plans[state.date]=a;save();document.getElementById("addModal")?.remove();document.getElementById("dayScreen")?.remove();openDay(state.date)}
 function settings(){
-document.getElementById("modal").innerHTML=`<div class="sheet"><button class="close" onclick="closeM()">×</button><h3>Настройки</h3><p>Акцент</p><div class="opts"><button class="opt ${state.accent==="green"?"selected":""}" onclick="setAccent('green')">Изумрудный</button><button class="opt ${state.accent==="pink"?"selected":""}" onclick="setAccent('pink')">Розовый</button></div><p>Тема</p><div class="opts"><button class="opt ${state.theme==="day"?"selected":""}" onclick="setTheme('day')">День</button><button class="opt ${state.theme==="night"?"selected":""}" onclick="setTheme('night')">Ночь</button></div><p>Фон карточки</p><div class="opts">${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?"selected":""}" onclick="setBg('${k}')"><div class="bgthumb" style="background-image:url('${v}')"></div>${{mist:"Туманное утро",forest:"Тихий лес",sea:"Спокойное море",night:"Ночное небо"}[k]}</button>`).join("")}</div></div>`;document.getElementById("modal").style.display="flex"}
-function setAccent(x){state.accent=x;save();settings();render()}function setTheme(x){state.theme=x;save();settings();render()}function setBg(x){state.bg=x;save();settings();render()}
-render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=12");
+const hue=getHueFromHex(state.solidColor||"#d9d3d6");
+document.getElementById("modal").innerHTML=`<div class="sheet"><button class="close" onclick="closeM()">×</button><h3>Настройки</h3>
+<p>Акцент</p><div class="opts"><button class="opt ${state.accent==="green"?"selected":""}" onclick="setAccent('green')">Изумрудный</button><button class="opt ${state.accent==="pink"?"selected":""}" onclick="setAccent('pink')">Розовый</button></div>
+<p>Тема</p><div class="opts"><button class="opt ${state.theme==="day"?"selected":""}" onclick="setTheme('day')">День</button><button class="opt ${state.theme==="night"?"selected":""}" onclick="setTheme('night')">Ночь</button></div>
+<p>Фон карточки</p><div class="opts">
+${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?"selected":""}" onclick="setBg('${k}')"><div class="bgthumb" style="background-image:url('${v}')"></div>${{mist:"Туманное утро",forest:"Тихий лес",sea:"Спокойное море",night:"Ночное небо"}[k]}</button>`).join("")}
+<button class="opt color-card ${state.bg==="color"?"selected":""}" onclick="setBg('color')"><div class="color-preview" style="background:${state.solidColor}"><span>Любой цвет</span></div>Однотонный фон</button>
+</div>
+<div class="color-panel">
+<p>Выбери цвет</p>
+<div class="picker-sv" id="svPicker" style="background-color:hsl(${hue},100%,50%)"><div class="picker-knob" id="svKnob"></div></div>
+<div class="picker-hue" id="huePicker"><div class="hue-knob" id="hueKnob"></div></div>
+<div class="color-code" id="colorCode">${state.solidColor}</div>
+</div>
+</div>`;
+document.getElementById("modal").style.display="flex";
+positionPicker(hue);
+attachColorPicker();
+}
+function getHueFromHex(hex){
+const {h}=hexToHsv(hex);return h;
+}
+function hexToHsv(hex){
+hex=hex.replace("#","");let r=parseInt(hex.slice(0,2),16)/255,g=parseInt(hex.slice(2,4),16)/255,b=parseInt(hex.slice(4,6),16)/255;
+let max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min,h=0;
+if(d){if(max===r)h=60*(((g-b)/d)%6);else if(max===g)h=60*((b-r)/d+2);else h=60*((r-g)/d+4);if(h<0)h+=360}
+return {h,s:max?d/max:0,v:max};
+}
+function hsvToHex(h,s,v){
+let c=v*s,x=c*(1-Math.abs((h/60)%2-1)),m=v-c,r=0,g=0,b=0;
+if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];
+return "#"+[r,g,b].map(q=>Math.round((q+m)*255).toString(16).padStart(2,"0")).join("");
+}
+function positionPicker(h){
+const {s,v}=hexToHsv(state.solidColor||"#d9d3d6");
+const sv=document.getElementById("svPicker"),hk=document.getElementById("hueKnob"),sk=document.getElementById("svKnob");
+if(sv&&sk){sk.style.left=`${s*100}%`;sk.style.top=`${(1-v)*100}%`}
+if(hk)hk.style.left=`${h/360*100}%`;
+}
+function attachColorPicker(){
+const sv=document.getElementById("svPicker"),hu=document.getElementById("huePicker");
+if(!sv||!hu)return;
+let hue=getHueFromHex(state.solidColor||"#d9d3d6");
+function point(el,e){
+const r=el.getBoundingClientRect(),x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+return {x,y};
+}
+function apply(h,s,v){
+state.solidColor=hsvToHex(h,s,v);state.bg="color";save();
+const svNow=document.getElementById("svPicker"),knob=document.getElementById("svKnob"),hk=document.getElementById("hueKnob"),code=document.getElementById("colorCode"),prev=document.querySelector(".color-preview");
+if(svNow)svNow.style.backgroundColor=`hsl(${h},100%,50%)`;
+if(knob){knob.style.left=`${s*100}%`;knob.style.top=`${(1-v)*100}%`}
+if(hk)hk.style.left=`${h/360*100}%`;
+if(code)code.textContent=state.solidColor;
+if(prev)prev.style.background=state.solidColor;
+const progress=document.querySelector(".progress");if(progress){progress.style.backgroundImage="none";progress.style.backgroundColor=state.solidColor}
+}
+let svDown=false,hDown=false;
+sv.addEventListener("pointerdown",e=>{svDown=true;sv.setPointerCapture(e.pointerId);let p=point(sv,e);apply(hue,p.x,1-p.y)});
+sv.addEventListener("pointermove",e=>{if(!svDown)return;let p=point(sv,e);apply(hue,p.x,1-p.y)});
+sv.addEventListener("pointerup",()=>svDown=false);
+hu.addEventListener("pointerdown",e=>{hDown=true;hu.setPointerCapture(e.pointerId);let p=point(hu,e);hue=p.x*360;apply(hue,...Object.values(hexToHsv(state.solidColor)).slice(1))});
+hu.addEventListener("pointermove",e=>{if(!hDown)return;let p=point(hu,e);hue=p.x*360;let hsv=hexToHsv(state.solidColor);apply(hue,hsv.s,hsv.v)});
+hu.addEventListener("pointerup",()=>hDown=false);
+}
+function setAccent(x){state.accent=x;save();settings();render()}
+function setTheme(x){state.theme=x;save();settings();render()}
+function setBg(x){state.bg=x;save();settings();render()}
+render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=13");
 </script>
 </body></html>
