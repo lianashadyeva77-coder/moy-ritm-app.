@@ -121,9 +121,52 @@ const track=document.getElementById("track");
 if(!track)return;
 [...track.children].forEach((el,i)=>el.classList.toggle("under-pill",i===index));
 }
-function addTask(id){let a=state.plans[state.date]||[];const existing=a.findIndex(x=>x.id===id);if(existing!==-1){a.splice(existing,1)}else{let t=tasks.find(x=>x[0]===id);if(!t)return;a.push({id,name:t[1],done:false})}state.plans[state.date]=a;save();render()}
-function toggleDayOpen(){state.dayOpen=!state.dayOpen;render()}
-function toggle(i){state.plans[state.date][i].done=!state.plans[state.date][i].done;save();render()}
+function refreshTaskUI(){
+const planned=state.plans[state.date]||[],done=planned.filter(x=>x.done).length,pct=planned.length?Math.round(done/planned.length*100):0;
+const today=document.querySelector(".today-title"),pctEl=document.querySelector(".pct"),sub=document.querySelector(".sub"),bar=document.querySelector(".bar>i"),summary=document.querySelector(".day-summary");
+if(today)today.textContent=`Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}`;
+if(pctEl)pctEl.textContent=`${pct}%`;
+if(sub)sub.textContent=`${done} из ${planned.length} выполнено`;
+if(bar)bar.style.width=`${pct}%`;
+if(summary){const c=summary.querySelector(".count");if(c)c.textContent=planned.length?planned.length:"нет";summary.classList.toggle("open",!!state.dayOpen)}
+}
+
+function syncSelectedTiles(){
+const selected=new Set((state.plans[state.date]||[]).map(x=>x.id));
+document.querySelectorAll(".tasklib .tile").forEach(tile=>{
+const m=tile.getAttribute("onclick")?.match(/addTask\('([^']+)'\)/), id=m&&m[1];
+if(!id)return;
+const on=selected.has(id);
+tile.classList.toggle("selected",on);
+let check=tile.querySelector(".plus");
+if(on&&!check){check=document.createElement("span");check.className="plus";check.textContent="✓";tile.appendChild(check)}
+if(!on&&check)check.remove();
+});
+}
+
+function syncAddedList(){
+const box=document.querySelector(".added");if(!box)return;
+const planned=state.plans[state.date]||[];
+if(!planned.length){box.innerHTML=`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`;return}
+if(!state.dayOpen){box.classList.add("collapsed");return}
+box.classList.remove("collapsed");
+box.innerHTML=planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><span class="check">${p.done?"✓":""}</span></div>`).join("");
+}
+
+function addTask(id){
+let a=state.plans[state.date]||[], existing=a.findIndex(x=>x.id===id);
+if(existing!==-1)a.splice(existing,1);
+else{let t=tasks.find(x=>x[0]===id);if(!t)return;a.push({id,name:t[1],done:false})}
+state.plans[state.date]=a;save();
+refreshTaskUI();syncSelectedTiles();
+if(state.dayOpen)syncAddedList();
+}
+
+function toggleDayOpen(){state.dayOpen=!state.dayOpen;const box=document.querySelector(".added");if(box)box.classList.toggle("collapsed",!state.dayOpen);const summary=document.querySelector(".day-summary");if(summary)summary.classList.toggle("open",state.dayOpen);if(state.dayOpen)syncAddedList()}
+function toggle(i){
+const a=state.plans[state.date]||[];if(!a[i])return;a[i].done=!a[i].done;save();
+refreshTaskUI();if(state.dayOpen)syncAddedList();
+}
 function updateDayHeaderOnly(){
 const d=dateFrom(state.date),planned=state.plans[state.date]||[],done=planned.filter(x=>x.done).length,pct=planned.length?Math.round(done/planned.length*100):0;
 const title=document.querySelector(".top h1"),progress=document.querySelector(".progress"),today=document.querySelector(".today-title"),pctEl=document.querySelector(".pct"),sub=document.querySelector(".sub"),bar=document.querySelector(".bar>i"),summary=document.querySelector(".day-summary"),added=document.querySelector(".added");
