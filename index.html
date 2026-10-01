@@ -36,7 +36,7 @@ body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:54
 .stats-task-list{margin-top:20px}.stats-task-list h3{font-size:18px;margin:0 0 10px}.stats-task{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}.stats-task .done-mark{margin-left:auto;color:var(--accent);font-weight:800}
 
 
-h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02)}.left{display:flex;align-items:center;gap:12px}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
+h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}.daytask-wrap{position:relative;overflow:hidden;border-radius:19px}.daytask{position:relative;z-index:2;background:var(--card);border:1px solid var(--line);border-radius:19px;padding:13px 14px;min-height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.02);transform:translateX(0);transition:transform .18s ease}.daytask.swiping{transition:none}.daytask-delete{position:absolute;inset:0 0 0 auto;width:74px;background:#d95c62;color:#fff;border:0;display:grid;place-items:center;font-size:24px;z-index:1;cursor:pointer}.daytask-delete span{font-size:24px}.left{display:flex;align-items:center;gap:12px;min-width:0}.taskemoji{width:40px;height:40px;display:grid;place-items:center;flex:0 0 40px;font-size:31px;line-height:1}.name{font-size:15px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis}.check{width:24px;height:24px;border:2px solid #d9d3d6;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:14px;flex:0 0 24px}.done .check{background:var(--accent);border-color:var(--accent)}.done .name{text-decoration:line-through;color:var(--muted)}
 
 .tasklib{display:grid;grid-template-columns:1fr;gap:10px}.task-category{margin:18px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{display:flex;align-items:center;gap:8px;margin:0 2px 9px;color:var(--muted);font-size:14px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.task-category-title .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}.category-select{width:100%;height:54px;border:1px solid var(--line);border-radius:17px;background:var(--card);padding:0 14px;font:inherit;font-size:16px;color:var(--text);outline:none}.category-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--selected-bg)}
 .tile{appearance:none;width:100%;height:82px;min-height:82px;max-height:82px;flex:0 0 82px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:12px 16px;display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
@@ -167,10 +167,10 @@ document.getElementById("app").innerHTML=`<div class="app">
 <div class="top"><h1 class="month-trigger" onclick="month()">${d.toLocaleDateString("ru-RU",{month:"long"})}</h1><button class="iconbtn" onclick="settings()">⚙︎</button></div>
 <div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill" aria-hidden="true"></div></div>
 <div class="progress" style="${state.bg==="color"?"background-image:none;background-color:"+state.solidColor:"background-image:url('"+photos[state.bg]+"')"}" onclick="openTodayStats()" role="button" tabindex="0"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
-<button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><div class="time-row">${p.time?`<span class="time-btn set">${p.time}</span>`:""}<span class="check">${p.done?"✓":""}</span></div></div>`).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
+<button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>dayTaskMarkup(p,i)).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
 <h2>Добавить дело</h2><div class="tasklib">${Object.entries(categoryTasks()).filter(([cat,items])=>items.length).map(([cat,items])=>`<section class="task-category"><h3 class="task-category-title"><span class="dot"></span>${cat}</h3>${items.map(t=>`<button class="tile ${selected.has(t[0])?"selected":""}" onclick="addTask('${t[0]}')"><span class="tileemoji">${t[2]}</span><span class="name">${t[1]}</span>${selected.has(t[0])?'<span class="plus">✓</span>':''}</button>`).join("")}</section>`).join("")}<button class="custom-task-create" type="button" onclick="openCustomTaskForm()">＋ Новое дело</button></div>
 </div><div class="nav"><button class="sel">День</button><button onclick="month()">Месяц</button><button onclick="settings()">Настройки</button></div><div class="modal" id="modal"></div>`;
-requestAnimationFrame(centerDates);
+requestAnimationFrame(()=>{centerDates();attachDayTaskSwipe(document.querySelector(".added"));});
 attachSwipe();
 }
 function taskIcon(id){const t=allTasks().find(t=>t[0]===id);return t?t[2]:"📝"}
@@ -217,7 +217,61 @@ const planned=state.plans[state.date]||[];
 if(!planned.length){box.innerHTML=`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`;return}
 if(!state.dayOpen){box.classList.add("collapsed");return}
 box.classList.remove("collapsed");
-box.innerHTML=planned.map((p,i)=>`<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})"><div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div><div class="time-row">${p.time?`<span class="time-btn set">${p.time}</span>`:""}<span class="check">${p.done?"✓":""}</span></div></div>`).join("");
+box.innerHTML=planned.map((p,i)=>dayTaskMarkup(p,i)).join("");
+attachDayTaskSwipe(box);
+}
+
+
+function dayTaskMarkup(p,i){
+return `<div class="daytask-wrap" data-index="${i}">
+<button class="daytask-delete" type="button" aria-label="Убрать из сегодняшних дел" onclick="event.stopPropagation();removeFromToday(${i})"><span>🗑️</span></button>
+<div class="daytask ${p.done?"done":""}" onclick="toggle(${i})">
+<div class="left"><span class="taskemoji">${taskIcon(p.id)}</span><span class="name">${p.name}</span></div>
+<div class="time-row">${p.time?`<span class="time-btn set">${p.time}</span>`:""}<span class="check">${p.done?"✓":""}</span></div>
+</div></div>`;
+}
+function removeFromToday(i){
+const a=state.plans[state.date]||[];
+if(!a[i])return;
+a.splice(i,1);
+state.plans[state.date]=a;
+save();
+refreshTaskUI();
+syncSelectedTiles();
+syncAddedList();
+}
+function attachDayTaskSwipe(box){
+if(!box)return;
+box.querySelectorAll(".daytask-wrap").forEach(wrap=>{
+const row=wrap.querySelector(".daytask");
+if(!row)return;
+let sx=0,sy=0,dx=0,drag=false,vertical=false;
+const start=e=>{
+const t=e.touches?e.touches[0]:e;
+sx=t.clientX;sy=t.clientY;dx=0;drag=true;vertical=false;
+row.classList.add("swiping");
+};
+const move=e=>{
+if(!drag)return;
+const t=e.touches?e.touches[0]:e;
+dx=t.clientX-sx; const dy=t.clientY-sy;
+if(Math.abs(dy)>Math.abs(dx)+6){vertical=true;return;}
+if(dx>0)dx=0;
+if(dx<-82)dx=-82;
+row.style.transform=`translateX(${dx}px)`;
+if(e.cancelable)e.preventDefault();
+};
+const end=()=>{
+if(!drag)return;
+drag=false;row.classList.remove("swiping");
+if(vertical){row.style.transform="translateX(0)";return;}
+row.style.transform=dx<-38?"translateX(-74px)":"translateX(0)";
+};
+row.addEventListener("touchstart",start,{passive:true});
+row.addEventListener("touchmove",move,{passive:false});
+row.addEventListener("touchend",end,{passive:true});
+row.addEventListener("touchcancel",end,{passive:true});
+});
 }
 
 function addTask(id){
@@ -434,13 +488,30 @@ modal.innerHTML=`<div class="custom-form"><button class="close" onclick="documen
 document.body.appendChild(modal);setTimeout(()=>document.getElementById('customTaskName')?.focus(),50);
 }
 function saveCustomTask(fromDay=false){
-const name=(document.getElementById('customTaskName')?.value||'').trim();let emoji=(document.getElementById('customTaskEmoji')?.value||'📝').trim();const category=document.getElementById('customTaskCategory')?.value||"Планы";
-if(!name)return; if(!emoji)emoji='📝';
+const name=(document.getElementById('customTaskName')?.value||'').trim();
+let emoji=(document.getElementById('customTaskEmoji')?.value||'📝').trim();
+const category=document.getElementById('customTaskCategory')?.value||"Планы";
+if(!name)return;
+if(!emoji)emoji='📝';
 const id='custom_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
-customTasks.push([id,name,emoji,category]);saveCustomTasks();
-const a=state.plans[state.date]||[];if(!a.some(x=>x.id===id))a.push({id,name,done:false,time:"",reminder:false});state.plans[state.date]=a;save();
-document.getElementById('customTaskModal')?.remove();document.getElementById('addModal')?.remove();
-if(fromDay){renderDayInPlace();openAddSheet();}else{refreshTaskUI();syncSelectedTiles();syncAddedList();}
+
+// Новое дело создаётся только в постоянной библиотеке.
+// В сегодняшний день оно не добавляется автоматически.
+customTasks.push([id,name,emoji,category]);
+saveCustomTasks();
+
+document.getElementById('customTaskModal')?.remove();
+
+if(fromDay){
+  // Оставляем пользователя в режиме выбора дел дня.
+  // Новое дело уже появилось в нужной категории, но ждёт отдельного нажатия.
+  document.getElementById('addModal')?.remove();
+  openAddSheet();
+}else{
+  refreshTaskUI();
+  syncSelectedTiles();
+  syncAddedList();
+}
 }
 
 function addFromDetail(id){
