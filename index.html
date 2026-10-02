@@ -182,6 +182,74 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .dark #globalNav{background:rgba(35,35,38,.96);border-top-color:#353438;color:#aaa}
 .dark #globalNav button{color:#aaa}.dark #globalNav button.sel{color:#fff}
 </style>
+<style id="ritm-v51-grid">
+/* v51 — strict 8pt rhythm, one text grid, quiet task cards */
+:root{
+  --grid:8px;
+  --surface:#ffffff;
+  --surface-selected:#eceeed;
+  --shadow-quiet:0 1px 2px rgba(35,31,33,.06),0 4px 12px rgba(35,31,33,.035);
+}
+.app{max-width:540px;padding:calc(20px + env(safe-area-inset-top)) 20px calc(108px + env(safe-area-inset-bottom));}
+.top{height:44px;margin:0 0 16px;align-items:center}
+.top h1{font-size:27px;line-height:32px;letter-spacing:-.025em;margin:0;text-transform:uppercase}
+.iconbtn{width:44px;height:44px;padding:0;display:grid;place-items:center;color:var(--accent);border:0;background:transparent}
+.iconbtn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.calendar{height:88px;margin:0 0 20px}
+.calendar-track,.calendar-date{height:88px}
+.calendar-date{gap:6px}
+.calendar-date .dow{font-size:14px;line-height:18px;font-weight:500}
+.calendar-date .num{font-size:26px;line-height:28px;font-weight:650;letter-spacing:-.02em}
+.center-pill{height:88px;border-radius:30px;box-shadow:0 5px 14px rgba(47,118,104,.12)}
+.center-pill .pill-dow{top:25px;font-size:14px;line-height:18px}
+.center-pill .pill-num{top:48px;font-size:26px;line-height:28px}
+.progress{height:176px;margin:0 0 24px;padding:20px 22px;border-radius:24px}
+.today-title{font-size:18px;line-height:24px;margin:0 0 8px;font-weight:650}
+.pct{font-size:44px;line-height:44px;font-weight:760;letter-spacing:-.035em}
+.sub{font-size:16px;line-height:22px;margin-top:8px}
+.bar{height:7px;margin-top:18px}
+.day-summary{height:44px;padding:0;margin:0 0 12px;font-size:20px;line-height:28px;font-weight:700;letter-spacing:-.02em}
+.day-summary .count{font-size:14px;line-height:20px;margin-left:7px;font-weight:500}
+.day-summary .chev{width:44px;height:44px;font-size:0;position:relative;color:var(--muted);display:grid;place-items:center}
+.day-summary .chev::before{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s ease}
+.day-summary.open .chev::before{transform:rotate(225deg) translate(-2px,-2px)}
+.added{gap:8px;margin:0 0 24px}
+.daytask-wrap{border-radius:15px}
+.daytask{min-height:56px;height:56px;padding:8px 14px;border:0!important;border-radius:15px;background:var(--surface);box-shadow:var(--shadow-quiet)}
+.daytask .left{gap:10px}
+.taskemoji{width:36px;height:36px;flex-basis:36px;font-size:28px}
+.daytask .name{font-size:16px;line-height:20px;font-weight:600;letter-spacing:-.01em}
+.time-row{display:flex;align-items:center;gap:8px}
+.check{width:20px;height:20px;flex:0 0 20px;border:1.8px solid #d0ccce;border-radius:50%;font-size:0}
+.check::after{content:"";width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.done .check{background:var(--accent);border-color:var(--accent)}
+.done .check::after{opacity:1}
+h2{font-size:20px;line-height:28px;margin:24px 0 12px;letter-spacing:-.02em}
+.tasklib{gap:8px}
+.task-category{margin:20px 0 8px}
+.task-category:first-child{margin-top:0}
+.task-category-title{height:20px;gap:7px;margin:0 4px 8px;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.045em}
+.task-category-title .dot{width:6px;height:6px;flex:0 0 6px}
+.library-task-wrap{border-radius:15px;margin:0 4px}
+.tile{height:64px;min-height:64px;max-height:64px;flex:0 0 64px;padding:8px 14px;gap:12px;border:0!important;border-radius:15px;background:var(--surface);box-shadow:var(--shadow-quiet)}
+.tile .name{font-size:16px;line-height:20px;font-weight:600;letter-spacing:-.01em}
+.tileemoji{width:36px;height:36px;flex:0 0 36px;font-size:28px}
+.plus{width:28px;height:28px;flex:0 0 28px;margin-left:auto;display:grid;place-items:center;font-size:0;color:var(--accent)}
+.plus::after{content:"";width:10px;height:5px;border-left:2.2px solid currentColor;border-bottom:2.2px solid currentColor;transform:rotate(-45deg) translate(1px,-1px)}
+.tile.selected{background:var(--surface-selected)!important;box-shadow:var(--shadow-quiet);border:0!important}
+.tile.selected .name{color:var(--accent)}
+.custom-task-create{height:48px;margin-top:8px;font-size:16px;line-height:22px}
+.empty{font-size:14px;line-height:20px;padding:4px 0}
+/* Same 44pt control and same stroke language everywhere. */
+.back,.stats-back,.sheet-back,.close{font-size:0!important}
+.back::before,.stats-back::before,.sheet-back::before{content:"";width:9px;height:9px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.close::before,.close::after{content:"";position:absolute;width:15px;height:2px;background:currentColor;border-radius:2px}
+.close{position:relative}.close::before{transform:rotate(45deg)}.close::after{transform:rotate(-45deg)}
+/* persistent tab bar uses identical 1.8px strokes and 44pt-ish visual targets */
+#globalNav button .nav-icon svg{stroke-width:1.8}
+#globalNav button .nav-icon{width:22px;height:22px}
+#globalNav button .nav-icon svg{width:22px;height:22px}
+</style>
 </head>
 <body><div id="app"></div><nav id="globalNav" aria-label="Основная навигация"><div class="global-nav-inner">
 <button type="button" data-route="day"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6.5 9.5V20h11V9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><span>День</span></button>
@@ -190,21 +258,22 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 <button type="button" data-route="settings"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z"/><path d="M19.4 15.1a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.09h-2.7v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06a1.7 1.7 0 0 0 .34-1.88 1.7 1.7 0 0 0-1.56-1.03H6v-2.7h.09a1.7 1.7 0 0 0 1.56-1.03 1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.12 5v-.09h2.7V5a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.09v2.7h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></svg></span><span>Настройки</span></button>
 </div></nav>
 <script>
-// v49: single persistent navigation. It lives outside every screen/modal so it never scrolls away.
+// v51: one deterministic persistent navigation handler.
 (function(){
+  const nav=document.getElementById("globalNav");
   function closeTransient(){
     document.getElementById("periodScreen")?.remove();
     document.getElementById("dayScreen")?.remove();
     const modal=document.getElementById("modal");
-    if(modal) modal.style.display="none";
+    if(modal){modal.style.display="none";modal.innerHTML="";}
   }
   function go(route){
     closeTransient();
-    if(route==="day"){ render(); }
-    else if(route==="month"){ month(); }
-    else if(route==="stats"){ openPeriodStats(); }
-    else if(route==="settings"){ settings(); }
-    setTimeout(updateGlobalNav,0);
+    if(route==="day") render();
+    else if(route==="month") month();
+    else if(route==="stats") openPeriodStats();
+    else if(route==="settings") settings();
+    requestAnimationFrame(updateGlobalNav);
   }
   function updateGlobalNav(){
     const period=!!document.getElementById("periodScreen");
@@ -212,11 +281,17 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
     const modal=document.getElementById("modal");
     const settingsOpen=!!(modal && modal.style.display!=="none" && modal.querySelector(".settings-nav"));
     const monthOpen=!!(modal && modal.style.display!=="none" && modal.querySelector(".month-sheet"));
-    let active=period?"stats":settingsOpen?"settings":monthOpen?"month":day?"day":"day";
-    document.querySelectorAll("#globalNav button").forEach(b=>b.classList.toggle("sel",b.dataset.route===active));
+    const active=period?"stats":settingsOpen?"settings":monthOpen?"month":day?"day":"day";
+    nav?.querySelectorAll("button[data-route]").forEach(b=>b.classList.toggle("sel",b.dataset.route===active));
   }
   window.updateGlobalNav=updateGlobalNav;
-  document.addEventListener("click",e=>{const b=e.target.closest?.("#globalNav button[data-route]");if(!b)return;e.preventDefault();e.stopPropagation();go(b.dataset.route)},true);
+  nav?.addEventListener("click",e=>{
+    const b=e.target.closest("button[data-route]");
+    if(!b)return;
+    e.preventDefault();
+    e.stopPropagation();
+    go(b.dataset.route);
+  });
   window.addEventListener("load",updateGlobalNav);
 })();
 
@@ -284,7 +359,7 @@ const planned=state.plans[state.date]||[],done=planned.filter(x=>x.done).length,
 const dates=[];for(let i=-15;i<=15;i++)dates.push(new Date(d.getFullYear(),d.getMonth(),d.getDate()+i));
 const selected=new Set(planned.map(x=>x.id));
 document.getElementById("app").innerHTML=`<div class="app">
-<div class="top"><h1 class="month-trigger" onclick="month()">${d.toLocaleDateString("ru-RU",{month:"long"})}</h1><button class="iconbtn" onclick="settings()">⚙︎</button></div>
+<div class="top"><h1 class="month-trigger" onclick="month()">${d.toLocaleDateString("ru-RU",{month:"long"})}</h1><button class="iconbtn" onclick="settings()" aria-label="Настройки"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z"/><path d="M19.4 15.1a1.7 1.7 0 0 0 .34 1.88l.06.06-1.9 1.9-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.09h-2.7v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.9-1.9.06-.06a1.7 1.7 0 0 0 .34-1.88 1.7 1.7 0 0 0-1.56-1.03H6v-2.7h.09a1.7 1.7 0 0 0 1.56-1.03 1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.9-1.9.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12.12 5v-.09h2.7V5a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.9 1.9-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.09v2.7h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></svg></button></div>
 <div class="calendar" id="calendar"><div class="calendar-track" id="track">${dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("")}</div><div class="center-pill" aria-hidden="true"></div></div>
 <div class="progress" style="${state.bg==="color"?"background-image:none;background-color:"+state.solidColor:"background-image:url('"+photos[state.bg]+"')"}" onclick="openTodayStats()" role="button" tabindex="0"><div class="today-title">Сегодня ${planned.length} ${plural(planned.length,"задача","задачи","задач")}</div><div class="pct">${pct}%</div><div class="sub">${done} из ${planned.length} выполнено</div><div class="bar"><i style="width:${pct}%"></i></div></div>
 <button class="day-summary ${state.dayOpen?"open":""}" onclick="toggleDayOpen()"><span>Сегодняшние дела <span class="count">${planned.length?planned.length:"нет"}</span></span><span class="chev">⌄</span></button><div class="added ${state.dayOpen?"":"collapsed"}">${planned.length?planned.map((p,i)=>dayTaskMarkup(p,i)).join(""):`<div class="empty">Добавь дела ниже — они появятся здесь.</div>`}</div>
@@ -1000,9 +1075,11 @@ window.addEventListener("beforeunload",()=>persistData());
 })();
 
 persistData();
-applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=40");
+applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=51");
 </script>
-</body></html>
+</body>
+
+</html>
 <style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
 <style id="ritm-v50-system">
 /* v50 — unified 8pt grid / typography / controls / navigation */
@@ -1047,30 +1124,4 @@ h2{font-size:20px;line-height:1.2;margin:24px 0 12px;letter-spacing:-.015em}
 /* category + setting controls use the same rhythm */
 .settings-block{margin-top:28px;padding-top:20px;border-top:0}.settings-title{font-size:13px;line-height:18px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
 </style>
-<script>
-// v50: keep the single global tab bar above every sheet/screen and route deterministically.
-(function(){
-  const nav=document.getElementById('globalNav');
-  if(!nav)return;
-  nav.style.zIndex='100000';
-  function route(route){
-    try{
-      document.getElementById('periodScreen')?.remove();
-      document.getElementById('dayScreen')?.remove();
-      const modal=document.getElementById('modal');
-      if(modal){modal.style.display='none';modal.innerHTML='';}
-      if(route==='day'){window.render?.();}
-      else if(route==='month'){window.month?.();}
-      else if(route==='stats'){window.openPeriodStats?.();}
-      else if(route==='settings'){window.settings?.();}
-      setTimeout(window.updateGlobalNav,30);
-    }catch(err){console.error('Navigation error',err)}
-  }
-  nav.addEventListener('click',function(e){
-    const b=e.target.closest('button[data-route]');
-    if(!b)return;
-    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
-    route(b.dataset.route);
-  },true);
-})();
-</script>
+
