@@ -1077,51 +1077,35 @@ window.addEventListener("beforeunload",()=>persistData());
 persistData();
 applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=51");
 </script>
+
+<style id="ritm-v52-final">
+:root{--page:#f7f6f5;--surface:#fff;--surface-selected:#eceeed;--ink:#252326;--muted:#929093;--accent:#347f72;--quiet-shadow:0 1px 2px rgba(25,22,24,.045),0 5px 14px rgba(25,22,24,.035)}
+html,body{background:var(--page);color:var(--ink);font-size:16px;line-height:1.5}body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.app{max-width:540px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 20px calc(112px + env(safe-area-inset-bottom));box-sizing:border-box}
+.top{height:44px;margin:0 0 16px;display:flex;align-items:center}.top h1{margin:0;font-size:27px;line-height:32px;font-weight:760;letter-spacing:-.025em}.iconbtn{width:44px;height:44px;min-width:44px;padding:0;margin-left:auto;display:grid;place-items:center;border:0;background:transparent;color:var(--accent)}.iconbtn svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.calendar{height:88px;margin:0 0 20px}.calendar-track,.calendar-date{height:88px}.calendar-date .dow{font-size:14px;line-height:18px;font-weight:500;color:#8e8b8d}.calendar-date .num{font-size:26px;line-height:28px;font-weight:650;letter-spacing:-.02em}.center-pill{height:88px;border-radius:30px;box-shadow:0 5px 14px rgba(52,127,114,.10)}.center-pill .pill-dow{font-size:14px;line-height:18px}.center-pill .pill-num{font-size:26px;line-height:28px}
+.progress{height:176px;box-sizing:border-box;margin:0 0 24px;padding:20px 22px;border-radius:24px;box-shadow:none}.today-title{font-size:18px;line-height:24px;margin:0 0 8px;font-weight:650}.pct{font-size:44px;line-height:44px;font-weight:760;letter-spacing:-.035em}.sub{font-size:16px;line-height:22px;margin-top:8px}.bar{height:7px;margin-top:18px}
+h2{font-size:20px;line-height:28px;margin:24px 0 12px;font-weight:720;letter-spacing:-.02em}.day-summary{height:44px;width:100%;box-sizing:border-box;margin:0 0 12px;padding:0;background:transparent;border:0;display:flex;align-items:center;justify-content:space-between;font-size:20px;line-height:28px;font-weight:720;letter-spacing:-.02em}.day-summary .count{margin-left:7px;font-size:14px;line-height:20px;font-weight:500;color:var(--muted)}.day-summary .chev{width:44px;height:44px;min-width:44px;padding:0;font-size:0;display:grid;place-items:center;color:#7f7c7f}.day-summary .chev::before{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px)}.day-summary.open .chev::before{transform:rotate(225deg) translate(-2px,-2px)}
+.added{gap:8px;margin:0 0 24px}.daytask-wrap{margin:0;border-radius:15px;overflow:hidden}.daytask{height:56px;min-height:56px;box-sizing:border-box;padding:8px 14px;border:0!important;border-radius:15px;background:var(--surface);box-shadow:var(--quiet-shadow)}.daytask .left{gap:10px}.taskemoji{width:36px;height:36px;flex:0 0 36px;font-size:28px}.daytask .name{font-size:16px;line-height:20px;font-weight:600;letter-spacing:-.01em}.check{width:20px;height:20px;min-width:20px;box-sizing:border-box;border:1.8px solid #d0ccce;border-radius:50%;font-size:0;display:grid;place-items:center}.check::after{content:"";width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);opacity:0}.done .check{background:var(--accent);border-color:var(--accent)}.done .check::after{opacity:1}
+.tasklib{display:grid;grid-template-columns:1fr;gap:8px}.task-category{margin:20px 0 8px}.task-category:first-child{margin-top:0}.task-category-title{height:20px;box-sizing:border-box;display:flex;align-items:center;gap:7px;margin:0 0 8px;padding:0;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.045em;text-transform:uppercase;color:#8d898c}.task-category-title .dot{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:var(--accent)}.library-task-wrap{height:64px;margin:0;border-radius:15px;overflow:hidden}.tile{width:100%;height:64px;min-height:64px;max-height:64px;box-sizing:border-box;padding:8px 14px;display:flex;align-items:center;gap:12px;border:0!important;border-radius:15px;background:var(--surface);box-shadow:var(--quiet-shadow)}.tile .name{font-size:16px;line-height:20px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}.tileemoji{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;font-size:28px}.plus{width:28px;height:28px;min-width:28px;flex:0 0 28px;margin-left:auto;padding:0;display:grid;place-items:center;font-size:0;color:var(--accent)}.plus::after{content:"";width:10px;height:5px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg) translate(1px,-1px)}.tile.selected{background:var(--surface-selected)!important;box-shadow:none;border:0!important}.tile.selected .name{color:var(--ink)!important}.custom-task-create{height:48px;margin-top:8px;padding:0;border:0!important;background:transparent;color:var(--accent);font-size:16px;line-height:22px;font-weight:650}
+.back,.stats-back,.sheet-back,.close{width:44px!important;height:44px!important;min-width:44px;min-height:44px;padding:0!important;border:0!important;background:transparent;box-shadow:none;font-size:0!important;display:grid;place-items:center;position:relative}.back::before,.stats-back::before,.sheet-back::before{content:"";width:9px;height:9px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}.close::before,.close::after{content:"";position:absolute;width:15px;height:2px;border-radius:2px;background:currentColor}.close::before{transform:rotate(45deg)}.close::after{transform:rotate(-45deg)}
+#globalNav{height:calc(76px + env(safe-area-inset-bottom));padding:0 0 env(safe-area-inset-bottom);background:rgba(255,255,255,.96);border-top:1px solid rgba(0,0,0,.06);border-radius:0;box-shadow:0 -1px 12px rgba(0,0,0,.035);z-index:100000}#globalNav .global-nav-inner{height:76px;max-width:540px;width:100%;margin:0 auto;padding:0 8px;box-sizing:border-box;display:grid;grid-template-columns:repeat(4,1fr)}#globalNav button{height:76px;margin:0;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;background:transparent;color:#929093;font:500 11px/14px -apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}#globalNav button .nav-icon,#globalNav button .nav-icon svg{width:22px;height:22px}#globalNav button .nav-icon svg{stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}#globalNav button.sel{color:var(--accent);font-weight:650}#globalNav button:active{transform:none;opacity:.65}.app,.stats-screen,.day-screen,.period-screen{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+.dark #globalNav{background:rgba(35,35,38,.96);border-top-color:#353438}.dark #globalNav button{color:#aaa}.dark #globalNav button.sel{color:#fff}
+</style>
+
+<style id="ritm-v53-clean-icons">
+/* One source of truth for disclosure/check icons. */
+.day-summary .chev ~ .chev{display:none!important}
+.day-summary .chev{font-size:0!important;line-height:0!important;position:relative}
+.day-summary .chev::after{display:none!important;content:none!important}
+.tile .plus ~ .plus{display:none!important}
+.tile .plus{font-size:0!important;line-height:0!important;text-indent:-9999px;overflow:hidden}
+.tile .plus::before{display:none!important;content:none!important}
+.tile .plus::after{content:""!important;display:block!important;width:10px!important;height:5px!important;border-left:2px solid currentColor!important;border-bottom:2px solid currentColor!important;border-right:0!important;border-top:0!important;transform:rotate(-45deg) translate(1px,-1px)!important}
+</style>
 </body>
 
 </html>
 <style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
-<style id="ritm-v50-system">
-/* v50 — unified 8pt grid / typography / controls / navigation */
-:root{
-  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px; --space-6:24px; --space-7:32px;
-  --radius-card:20px; --radius-control:16px;
-  --line:#e7e2e3; --shadow-card:0 1px 3px rgba(24,20,22,.05),0 8px 24px rgba(24,20,22,.035);
-}
-html,body{font-size:16px;line-height:1.35}
-.app{max-width:540px;padding:calc(20px + env(safe-area-inset-top)) 20px calc(108px + env(safe-area-inset-bottom));}
-.top{min-height:44px;margin-bottom:8px}.top h1{font-size:26px;line-height:1.05;margin:0 0 12px;letter-spacing:-.02em}.iconbtn{width:44px;height:44px;padding:0;font-size:25px;display:grid;place-items:center}
-.calendar{height:88px;margin:0 0 20px}.calendar-track{height:88px}.calendar-date{height:88px}.calendar-date .dow{font-size:14px}.calendar-date .num{font-size:26px}.center-pill{height:88px;border-radius:30px}
-.progress{height:176px;border-radius:24px;padding:20px 22px;margin-bottom:24px;box-shadow:var(--shadow-card)}
-.today-title{font-size:18px;margin-bottom:8px}.pct{font-size:44px;line-height:.98}.sub{font-size:16px;margin-top:8px}.bar{height:7px;margin-top:18px}
-h2{font-size:20px;line-height:1.2;margin:24px 0 12px;letter-spacing:-.015em}
-.day-summary{width:100%;padding:0 2px;margin:0 0 12px;background:none;border:0;font-size:20px;line-height:28px;font-weight:700;display:flex;justify-content:space-between;align-items:center}.day-summary .chev{font-size:20px;color:var(--muted);width:44px;height:44px;display:grid;place-items:center}.added{gap:8px;margin-bottom:24px}
-.daytask-wrap,.library-task-wrap{border-radius:18px}
-.daytask,.tile{border:0!important;box-shadow:var(--shadow-card);border-radius:18px;background:var(--card)}
-.daytask{min-height:60px;padding:14px 18px}.daytask-delete,.library-task-delete{border:0}
-.tile{height:80px;min-height:80px;max-height:80px;padding:12px 18px;gap:14px}.tile .name{font-size:17px;font-weight:600}.tileemoji{width:42px;height:42px;flex-basis:42px;font-size:31px}.plus{width:44px;height:44px;display:grid;place-items:center;font-size:24px;margin-left:auto}
-.tile.selected{border:0!important;box-shadow:0 1px 3px rgba(47,118,104,.08),0 6px 18px rgba(47,118,104,.08)}
-.tasklib{gap:8px}.task-category{margin:24px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{gap:8px;margin:0 2px 10px;font-size:13px;line-height:18px}.task-category-title .dot{width:6px;height:6px}
-.custom-task-create{height:52px;border:0!important;border-radius:16px;box-shadow:none;background:transparent;color:var(--accent);font-size:16px;font-weight:650;margin-top:8px}
-/* one visual language for secondary cards: no noisy outlines */
-.period-summary,.period-chart,.period-task-row,.period-good,.period-advice,.period-category,.stats-hero,.stats-task,.stats-row{border:0!important;box-shadow:var(--shadow-card)}
-.period-section{margin-top:24px}.period-section>h3{font-size:20px;line-height:1.2;margin:0 0 12px;letter-spacing:-.015em}.period-chart{padding:18px;border-radius:20px}.period-chart-bars{border-bottom:0}.period-chart-legend{padding-top:2px}
-/* consistent navigation: four equal targets, no floating card */
-#globalNav{height:calc(76px + env(safe-area-inset-bottom));padding:0 0 env(safe-area-inset-bottom);border-top:1px solid rgba(0,0,0,.07);border-radius:0;box-shadow:0 -1px 12px rgba(0,0,0,.045);z-index:100000;pointer-events:auto}
-#globalNav .global-nav-inner{height:76px;max-width:540px;width:100%;padding:0 8px;grid-template-columns:repeat(4,1fr)}
-#globalNav button{height:76px;padding:8px 4px 6px;gap:3px;font-size:11px;font-weight:500;line-height:1.15;justify-content:center}
-#globalNav button .nav-icon,#globalNav button .nav-icon svg{width:22px;height:22px}
-#globalNav button .nav-icon svg{stroke-width:1.75}
-#globalNav button.sel{font-weight:650}
-#globalNav button:active{transform:none;opacity:.65}
-.app,.stats-screen,.day-screen,.period-screen{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
-/* make modal sheets stop before persistent nav and keep nav tappable */
-.sheet,.add-sheet{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
-.modal{z-index:80}
-#modal{z-index:80}
-/* unify close/back controls */
-.back,.stats-back,.sheet-back,.close{width:44px!important;height:44px!important;min-width:44px;min-height:44px;border:0!important;display:grid;place-items:center;border-radius:50%;font-size:24px;line-height:1;box-shadow:none}
-/* category + setting controls use the same rhythm */
-.settings-block{margin-top:28px;padding-top:20px;border-top:0}.settings-title{font-size:13px;line-height:18px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
-</style>
+
 
