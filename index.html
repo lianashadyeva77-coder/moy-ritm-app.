@@ -1004,3 +1004,73 @@ applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorke
 </script>
 </body></html>
 <style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
+<style id="ritm-v50-system">
+/* v50 — unified 8pt grid / typography / controls / navigation */
+:root{
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px; --space-6:24px; --space-7:32px;
+  --radius-card:20px; --radius-control:16px;
+  --line:#e7e2e3; --shadow-card:0 1px 3px rgba(24,20,22,.05),0 8px 24px rgba(24,20,22,.035);
+}
+html,body{font-size:16px;line-height:1.35}
+.app{max-width:540px;padding:calc(20px + env(safe-area-inset-top)) 20px calc(108px + env(safe-area-inset-bottom));}
+.top{min-height:44px;margin-bottom:8px}.top h1{font-size:26px;line-height:1.05;margin:0 0 12px;letter-spacing:-.02em}.iconbtn{width:44px;height:44px;padding:0;font-size:25px;display:grid;place-items:center}
+.calendar{height:88px;margin:0 0 20px}.calendar-track{height:88px}.calendar-date{height:88px}.calendar-date .dow{font-size:14px}.calendar-date .num{font-size:26px}.center-pill{height:88px;border-radius:30px}
+.progress{height:176px;border-radius:24px;padding:20px 22px;margin-bottom:24px;box-shadow:var(--shadow-card)}
+.today-title{font-size:18px;margin-bottom:8px}.pct{font-size:44px;line-height:.98}.sub{font-size:16px;margin-top:8px}.bar{height:7px;margin-top:18px}
+h2{font-size:20px;line-height:1.2;margin:24px 0 12px;letter-spacing:-.015em}
+.day-summary{width:100%;padding:0 2px;margin:0 0 12px;background:none;border:0;font-size:20px;line-height:28px;font-weight:700;display:flex;justify-content:space-between;align-items:center}.day-summary .chev{font-size:20px;color:var(--muted);width:44px;height:44px;display:grid;place-items:center}.added{gap:8px;margin-bottom:24px}
+.daytask-wrap,.library-task-wrap{border-radius:18px}
+.daytask,.tile{border:0!important;box-shadow:var(--shadow-card);border-radius:18px;background:var(--card)}
+.daytask{min-height:60px;padding:14px 18px}.daytask-delete,.library-task-delete{border:0}
+.tile{height:80px;min-height:80px;max-height:80px;padding:12px 18px;gap:14px}.tile .name{font-size:17px;font-weight:600}.tileemoji{width:42px;height:42px;flex-basis:42px;font-size:31px}.plus{width:44px;height:44px;display:grid;place-items:center;font-size:24px;margin-left:auto}
+.tile.selected{border:0!important;box-shadow:0 1px 3px rgba(47,118,104,.08),0 6px 18px rgba(47,118,104,.08)}
+.tasklib{gap:8px}.task-category{margin:24px 0 8px}.task-category:first-child{margin-top:4px}.task-category-title{gap:8px;margin:0 2px 10px;font-size:13px;line-height:18px}.task-category-title .dot{width:6px;height:6px}
+.custom-task-create{height:52px;border:0!important;border-radius:16px;box-shadow:none;background:transparent;color:var(--accent);font-size:16px;font-weight:650;margin-top:8px}
+/* one visual language for secondary cards: no noisy outlines */
+.period-summary,.period-chart,.period-task-row,.period-good,.period-advice,.period-category,.stats-hero,.stats-task,.stats-row{border:0!important;box-shadow:var(--shadow-card)}
+.period-section{margin-top:24px}.period-section>h3{font-size:20px;line-height:1.2;margin:0 0 12px;letter-spacing:-.015em}.period-chart{padding:18px;border-radius:20px}.period-chart-bars{border-bottom:0}.period-chart-legend{padding-top:2px}
+/* consistent navigation: four equal targets, no floating card */
+#globalNav{height:calc(76px + env(safe-area-inset-bottom));padding:0 0 env(safe-area-inset-bottom);border-top:1px solid rgba(0,0,0,.07);border-radius:0;box-shadow:0 -1px 12px rgba(0,0,0,.045);z-index:100000;pointer-events:auto}
+#globalNav .global-nav-inner{height:76px;max-width:540px;width:100%;padding:0 8px;grid-template-columns:repeat(4,1fr)}
+#globalNav button{height:76px;padding:8px 4px 6px;gap:3px;font-size:11px;font-weight:500;line-height:1.15;justify-content:center}
+#globalNav button .nav-icon,#globalNav button .nav-icon svg{width:22px;height:22px}
+#globalNav button .nav-icon svg{stroke-width:1.75}
+#globalNav button.sel{font-weight:650}
+#globalNav button:active{transform:none;opacity:.65}
+.app,.stats-screen,.day-screen,.period-screen{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+/* make modal sheets stop before persistent nav and keep nav tappable */
+.sheet,.add-sheet{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+.modal{z-index:80}
+#modal{z-index:80}
+/* unify close/back controls */
+.back,.stats-back,.sheet-back,.close{width:44px!important;height:44px!important;min-width:44px;min-height:44px;border:0!important;display:grid;place-items:center;border-radius:50%;font-size:24px;line-height:1;box-shadow:none}
+/* category + setting controls use the same rhythm */
+.settings-block{margin-top:28px;padding-top:20px;border-top:0}.settings-title{font-size:13px;line-height:18px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+</style>
+<script>
+// v50: keep the single global tab bar above every sheet/screen and route deterministically.
+(function(){
+  const nav=document.getElementById('globalNav');
+  if(!nav)return;
+  nav.style.zIndex='100000';
+  function route(route){
+    try{
+      document.getElementById('periodScreen')?.remove();
+      document.getElementById('dayScreen')?.remove();
+      const modal=document.getElementById('modal');
+      if(modal){modal.style.display='none';modal.innerHTML='';}
+      if(route==='day'){window.render?.();}
+      else if(route==='month'){window.month?.();}
+      else if(route==='stats'){window.openPeriodStats?.();}
+      else if(route==='settings'){window.settings?.();}
+      setTimeout(window.updateGlobalNav,30);
+    }catch(err){console.error('Navigation error',err)}
+  }
+  nav.addEventListener('click',function(e){
+    const b=e.target.closest('button[data-route]');
+    if(!b)return;
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    route(b.dataset.route);
+  },true);
+})();
+</script>
