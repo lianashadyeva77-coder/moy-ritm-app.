@@ -250,6 +250,33 @@ h2{font-size:20px;line-height:28px;margin:24px 0 12px;letter-spacing:-.02em}
 #globalNav button .nav-icon{width:22px;height:22px}
 #globalNav button .nav-icon svg{width:22px;height:22px}
 </style>
+
+<style id="v57-glow-fix">
+/* Reference-style glow: light radiates OUTSIDE the main progress card, never inside it. */
+.progress{
+  background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.52)) !important;
+  border:1px solid rgba(255,255,255,.92) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.46),
+    0 8px 24px rgba(34,30,28,.055),
+    0 0 24px rgba(255,218,120,.20),
+    0 0 52px rgba(255,218,120,.13),
+    0 0 82px rgba(255,218,120,.07) !important;
+  overflow:visible !important;
+}
+.progress:after{display:none !important;}
+.progress:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.38);
+}
+.progress .today-title,.progress .pct,.progress .sub,.progress .bar{position:relative;z-index:2;}
+.progress .bar{background:rgba(47,118,104,.11) !important;}
+.progress .bar i{background:linear-gradient(90deg,var(--emerald),#73a79d) !important;box-shadow:0 0 9px rgba(61,127,115,.16) !important;}
+</style>
 </head>
 <body><div id="app"></div><nav id="globalNav" aria-label="Основная навигация"><div class="global-nav-inner">
 <button type="button" data-route="day"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6.5 9.5V20h11V9.5"/><path d="M9.5 20v-6h5v6"/></svg></span><span>День</span></button>
@@ -536,57 +563,72 @@ let idx=Math.max(0,Math.min(track.children.length-1,15-Math.round(dx/w)));
 highlightCenter(idx);
 }
 cal.addEventListener("touchstart",e=>{
-sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;window.__ritmSwipeDx=0;drag=true;startIndex=15;
-cal.classList.add("dragging");track.style.transition="none";
+  sx=e.touches[0].clientX;
+  sy=e.touches[0].clientY;
+  dx=0;
+  window.__ritmSwipeDx=0;
+  drag=true;
+  startIndex=15;
+  cal.classList.add("dragging");
+  track.style.transition="none";
 },{passive:true});
 cal.addEventListener("touchmove",e=>{
-if(!drag)return;
-dx=e.touches[0].clientX-sx;window.__ritmSwipeDx=dx;let dy=e.touches[0].clientY-sy;
-if(Math.abs(dx)>Math.abs(dy)){e.preventDefault();updateDrag()}
+  if(!drag)return;
+  dx=e.touches[0].clientX-sx;
+  window.__ritmSwipeDx=dx;
+  const dy=e.touches[0].clientY-sy;
+  if(Math.abs(dx)>Math.abs(dy)){
+    e.preventDefault();
+    updateDrag();
+  }
 },{passive:false});
 cal.addEventListener("touchend",()=>{
-if(!drag)return;drag=false;window.__ritmSwipeDx=dx;cal.classList.remove("dragging");
-const {w,base}=metrics();
-let n=dx<-w*.32?1:dx>w*.32?-1:0;
-if(!n){track.style.transition="transform .18s ease-out";track.style.transform=`translate3d(${base}px,0,0)`;highlightCenter(15);return}
-track.style.transition="transform .22s cubic-bezier(.2,.78,.25,1)";
-track.style.transform=`translate3d(${base-n*w}px,0,0)`;
-const nextIndex=15+n;
-highlightCenter(nextIndex);
-setTimeout(()=>{
-/* Commit in-place: recycle one date node instead of rebuilding the calendar.
-   This keeps the page painted continuously and prevents the one-frame white flash. */
-const current=document.getElementById("track");
-if(!current)return;
-let selected=dateFrom(state.date);
-selected.setDate(selected.getDate()+n);
-state.date=key(selected);
-save();
-swipeSound();
-updateDayHeaderOnly();
+  if(!drag)return;
+  drag=false;
+  window.__ritmSwipeDx=dx;
+  cal.classList.remove("dragging");
 
-if(n===1){
-  const first=current.firstElementChild;
-  if(first) current.removeChild(first);
-  const lastDate=new Date(selected.getFullYear(),selected.getMonth(),selected.getDate()+16);
-  current.insertAdjacentHTML("beforeend",`<div class="calendar-date" data-date="${key(lastDate)}"><span class="dow">${lastDate.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${lastDate.getDate()}</span></div>`);
-}else{
-  const last=current.lastElementChild;
-  if(last) current.removeChild(last);
-  const firstDate=new Date(selected.getFullYear(),selected.getMonth(),selected.getDate()-16);
-  current.insertAdjacentHTML("afterbegin",`<div class="calendar-date" data-date="${key(firstDate)}"><span class="dow">${firstDate.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${firstDate.getDate()}</span></div>`);
-}
-current.style.transition="none";
-const m=metrics();
-current.style.transform=`translate3d(${m.base}px,0,0)`;
-highlightCenter(15);
-attachCalendarClicksOnly();
-},225);
+  const {w,base}=metrics();
+  // Commit to the nearest date reached by the finger, not just one day.
+  // Example: dragging ~4.2 date widths commits 4 days.
+  let n=Math.round(-dx/w);
+  n=Math.max(-15,Math.min(15,n));
+
+  if(!n){
+    track.style.transition="transform .18s ease-out";
+    track.style.transform=`translate3d(${base}px,0,0)`;
+    highlightCenter(15);
+    return;
+  }
+
+  track.style.transition="transform .28s cubic-bezier(.2,.78,.25,1)";
+  track.style.transform=`translate3d(${base+n*(-w)}px,0,0)`;
+  highlightCenter(15+n);
+
+  setTimeout(()=>{
+    const current=document.getElementById("track");
+    if(!current)return;
+    const selected=dateFrom(state.date);
+    selected.setDate(selected.getDate()+n);
+    state.date=key(selected);
+    save();
+    swipeSound();
+    updateDayHeaderOnly();
+
+    // Rebuild the 31-date window around the newly selected date.
+    // This keeps the selected date centered and allows another multi-day swipe immediately.
+    const dates=[];
+    for(let i=-15;i<=15;i++){
+      const x=new Date(selected.getFullYear(),selected.getMonth(),selected.getDate()+i);
+      dates.push(x);
+    }
+    current.innerHTML=dates.map(x=>`<div class="calendar-date ${key(x)===todayKey?"today":""}" data-date="${key(x)}"><span class="dow">${x.toLocaleDateString("ru-RU",{weekday:"short"}).replace(".","")}</span><span class="num">${x.getDate()}</span></div>`).join("");
+    current.style.transition="none";
+    current.style.transform=`translate3d(${metrics().base}px,0,0)`;
+    highlightCenter(15);
+    attachCalendarClicksOnly();
+  },290);
 },{passive:true});
-window.__ritmSwipeDx=0;
-cal.querySelectorAll(".calendar-date").forEach(el=>el.addEventListener("click",()=>{
-if(Math.abs(window.__ritmSwipeDx)<8){state.date=el.dataset.date;save();render()}
-}));
 }
 function month(){
 let d=dateFrom(state.date),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1),days=new Date(y,m+1,0).getDate(),lead=(first.getDay()+6)%7,cells="";
@@ -1125,6 +1167,291 @@ h2{font-size:20px;line-height:28px;margin:24px 0 12px;font-weight:720;letter-spa
 </style>
 </body>
 
+
+<style id="ritm-v56-refined">
+/* v56 — refined visual system: lighter typography, no emoji, no yellow background wash */
+:root{
+  --bg:#f4f2ee;
+  --ink:#242224;
+  --muted:#8f8b8e;
+  --emerald:#3d7f73;
+  --pink:#d99ab2;
+  --yellow:#ffd75a;
+  --glass:rgba(255,255,255,.72);
+  --glass-hi:rgba(255,255,255,.84);
+  --glass-line:rgba(255,255,255,.92);
+  --glass-shadow:0 12px 30px rgba(45,41,42,.07),0 2px 6px rgba(45,41,42,.035),inset 0 1px 0 rgba(255,255,255,.95);
+  --font-body:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  --font-weight-body:430;
+  --font-weight-title:650;
+}
+html,body{font-family:var(--font-body)!important;color:var(--ink)!important;background:var(--bg)!important;font-weight:var(--font-weight-body)}
+body.font-thin{--font-weight-body:390;--font-weight-title:570}
+body.font-standard{--font-weight-body:430;--font-weight-title:650}
+body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thin .period-title,body.font-thin .sheet h3{font-weight:570!important}
+/* no decorative yellow blob behind content */
+.app:before,.app:after,.day-screen:before,.day-screen:after,.period-screen:before,.period-screen:after{display:none!important}
+/* readable progress surface */
+.progress{background:rgba(255,255,255,.74)!important;color:var(--ink)!important;border-color:var(--glass-line)!important;box-shadow:var(--glass-shadow)!important}
+.progress:after{display:none!important}
+.progress .today-title,.progress .pct,.progress .sub{color:var(--ink)!important}
+.progress .today-title{font-weight:var(--font-weight-title)!important}
+.progress .pct{font-weight:700!important}
+.progress .bar{background:rgba(61,127,115,.12)!important}
+.progress .bar i{background:linear-gradient(90deg,var(--emerald),#69a297)!important;box-shadow:0 0 10px rgba(61,127,115,.14)!important}
+/* remove emoji everywhere; replace with quiet geometry */
+.tileemoji,.taskemoji{display:none!important}
+.tile{gap:0!important}
+.daytask .left{gap:0!important}
+.daytask .name{font-weight:var(--font-weight-title)!important}
+.tile .name{font-weight:var(--font-weight-title)!important}
+/* timeline: no emoji, clean nodes */
+.timeline-node{font-size:0!important;background:rgba(255,255,255,.78)!important;border:2px solid var(--bg)!important;box-shadow:0 0 0 1px rgba(61,127,115,.28),0 4px 12px rgba(45,41,42,.05)!important}
+.timeline-node:after{content:"";width:7px;height:7px;border-radius:50%;background:var(--emerald);opacity:.72}
+.timeline-item.done .timeline-node:after{background:var(--yellow);opacity:1;box-shadow:0 0 9px rgba(255,215,90,.45)}
+.timeline-card{background:var(--glass)!important;box-shadow:var(--glass-shadow)!important;border:1px solid var(--glass-line)!important}
+.timeline-task-name{font-weight:var(--font-weight-title)!important}
+/* single clean back icon — hide any legacy arrow and draw one chevron */
+.back,.sheet-back,.stats-back{font-size:0!important;position:relative!important}
+.back .back-chevron{display:none!important}
+.back:before,.sheet-back:before,.stats-back:before{content:""!important;width:12px!important;height:12px!important;border-left:2px solid currentColor!important;border-bottom:2px solid currentColor!important;transform:rotate(45deg)!important;display:block!important}
+/* settings icon: one proper iOS-like gear, no inner decorative circle */
+.iconbtn{font-size:0!important;position:relative!important}
+.iconbtn:before{content:"⚙";font-family:Arial,sans-serif;font-size:27px;line-height:1;color:var(--emerald);font-weight:400}
+.iconbtn svg{display:none!important}
+/* sheets stay inside viewport */
+.time-sheet{box-sizing:border-box!important;width:min(100%,540px)!important;max-width:540px!important;margin:0 auto!important;padding:22px 20px calc(20px + env(safe-area-inset-bottom))!important;border-radius:28px 28px 0 0!important;background:rgba(247,245,241,.96)!important;border:1px solid rgba(255,255,255,.95)!important;box-shadow:0 -16px 42px rgba(45,41,42,.10),inset 0 1px 0 rgba(255,255,255,.98)!important}
+#timeModal{align-items:flex-end!important;justify-content:center!important;padding:0!important;background:rgba(35,32,34,.18)!important;backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important}
+.time-sheet h3{font-size:22px!important;line-height:28px!important;font-weight:var(--font-weight-title)!important;margin:4px 44px 4px 0!important}
+.time-sheet .hint{font-size:14px!important;line-height:20px!important;margin-bottom:18px!important}
+.time-range{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.time-range-field{min-width:0}
+.time-range-field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px 3px}
+.time-range-field input{box-sizing:border-box;width:100%;height:56px;border:1px solid rgba(222,217,219,.95);border-radius:17px;background:rgba(255,255,255,.82);padding:0 12px;text-align:center;font-size:24px;font-weight:650;color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.95)}
+.time-range-field input:focus{outline:none;border-color:rgba(61,127,115,.35);box-shadow:0 0 0 3px rgba(61,127,115,.08),inset 0 1px 0 #fff}
+.time-range-note{margin-top:12px;padding:11px 13px;border-radius:15px;background:rgba(217,154,178,.11);color:var(--pink);font-size:13px;font-weight:600}
+.time-actions{margin-top:16px!important}
+.time-actions button{height:50px!important;border-radius:16px!important}
+.time-cancel{background:rgba(255,255,255,.72)!important;color:var(--muted)!important}
+.time-save{background:var(--emerald)!important;color:#fff!important;box-shadow:0 8px 18px rgba(61,127,115,.16)!important}
+/* settings — rebuild as a real settings surface */
+.sheet.settings-sheet{background:rgba(244,242,238,.92)!important}
+.settings-sheet .settings-title{font-size:11px!important;line-height:16px!important;letter-spacing:.11em!important;font-weight:650!important;color:#969194!important;margin:0 0 9px!important}
+.settings-sheet .settings-group{display:grid;gap:8px;margin:0 0 22px}
+.settings-sheet .opt{min-height:52px!important;padding:11px 14px!important;border-radius:17px!important;background:rgba(255,255,255,.68)!important;border:1px solid var(--glass-line)!important;box-shadow:var(--glass-shadow)!important;font-size:15px!important;font-weight:var(--font-weight-title)!important;text-align:left!important}
+.settings-sheet .opt.selected{background:rgba(232,233,232,.9)!important;color:var(--emerald)!important;box-shadow:inset 0 2px 5px rgba(45,41,42,.06),inset 0 1px 0 #fff!important}
+.font-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
+.font-choice button{height:58px;border-radius:17px;border:1px solid var(--glass-line);background:rgba(255,255,255,.68);box-shadow:var(--glass-shadow);color:var(--ink)}
+.font-choice button.selected{background:rgba(232,233,232,.9);color:var(--emerald);box-shadow:inset 0 2px 5px rgba(45,41,42,.06),inset 0 1px 0 #fff}
+.font-choice .thin-label{font-weight:390;font-size:17px}.font-choice .standard-label{font-weight:650;font-size:17px}
+.settings-sheet .bgthumb{height:62px!important;border-radius:13px!important;margin-bottom:8px!important}
+/* consistent icon stroke */
+#globalNav button .nav-icon svg{stroke-width:1.65!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+#globalNav button{font-weight:560!important}
+/* no second navigation/arrow layer anywhere */
+.day-screen>.period-nav,.period-screen>.period-nav,.sheet>.settings-nav,.sheet>.month-nav,.modal .nav:not(#globalNav){display:none!important}
+</style>
+<script id="ritm-v56-logic">
+(function(){
+  // One clean icon for the top settings button.
+  document.addEventListener('click', function(e){
+    const b=e.target.closest?.('.iconbtn');
+    if(b) b.blur();
+  }, true);
+
+  // Replace the old single-time picker with a compact start/end editor.
+  window.openTimePicker=function(index){
+    const a=state.plans[state.date]||[], p=a[index]; if(!p)return;
+    const start=p.time||"";
+    const end=p.timeEnd||"";
+    const modal=document.createElement("div");
+    modal.className="modal"; modal.style.display="flex"; modal.id="timeModal";
+    modal.innerHTML=`<div class="time-sheet">
+      <button class="close" onclick="document.getElementById('timeModal')?.remove()" aria-label="Закрыть"></button>
+      <h3>${p.name}</h3>
+      <p class="hint">Запланируй длительность дела</p>
+      <div class="time-range">
+        <div class="time-range-field"><label>Начало</label><input id="taskStartInput" type="time" value="${start}"></div>
+        <div class="time-range-field"><label>Конец</label><input id="taskEndInput" type="time" value="${end}"></div>
+      </div>
+      <div class="time-range-note">Напоминание — за 1 час до начала</div>
+      <div class="time-actions"><button class="time-cancel" onclick="clearTaskTime(${index})">Без времени</button><button class="time-save" onclick="saveTaskTime(${index})">Сохранить</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  };
+
+  window.saveTaskTime=function(index){
+    const start=document.getElementById('taskStartInput')?.value||'';
+    const end=document.getElementById('taskEndInput')?.value||'';
+    const a=state.plans[state.date]||[], p=a[index]; if(!p)return;
+    if(start && end && end<=start){
+      const endInput=document.getElementById('taskEndInput');
+      if(endInput){endInput.setCustomValidity('Время окончания должно быть позже начала');endInput.reportValidity();}
+      return;
+    }
+    p.time=start; p.timeEnd=end; p.reminder=!!start;
+    state.plans[state.date]=a; save(); document.getElementById('timeModal')?.remove(); renderDayInPlace();
+    if(start) requestNotificationPermission().then(()=>scheduleOpenReminder(p));
+  };
+
+  window.clearTaskTime=function(index){
+    const a=state.plans[state.date]||[];
+    if(a[index]){a[index].time='';a[index].timeEnd='';a[index].reminder=false;state.plans[state.date]=a;save();}
+    document.getElementById('timeModal')?.remove(); renderDayInPlace();
+  };
+
+  window.dayTimelineMarkup=function(a){
+    return a.map((p,i)=>{
+      const start=p.time||'';
+      const end=p.timeEnd||'';
+      const label=start?(end?`${start} — ${end}`:start):'Без времени';
+      const meta=start?(end?`Запланировано ${start}–${end}`:`Запланировано на ${start}`):'Добавь время';
+      const done=p.done?' done':'';
+      return `<div class="timeline-item${done}" data-index="${i}">
+        <div class="timeline-time">${label}</div>
+        <div class="timeline-track"><div class="timeline-node" aria-hidden="true"></div></div>
+        <button class="timeline-card" type="button" onclick="detailToggle(${i})">
+          <div class="timeline-card-top"><span class="timeline-task-name">${p.name}</span><span class="timeline-check" aria-hidden="true"></span></div>
+          <div class="timeline-card-meta"><span>${meta}</span><span class="timeline-edit" onclick="event.stopPropagation();openTimePicker(${i})">${start?'Изменить время':'Добавить время'}</span></div>
+        </button>
+      </div>`;
+    }).join('');
+  };
+
+  // Re-render immediately if the current day is already open.
+  window.renderDayInPlace=window.renderDayInPlace;
+
+  // Font choice lives in Settings and is persisted.
+  window.setFontStyle=function(style){
+    state.fontStyle=style; localStorage.setItem('ritmFontStyle',style);
+    document.body.classList.toggle('font-thin',style==='thin');
+    document.body.classList.toggle('font-standard',style!=='thin');
+    if(typeof settings==='function') settings();
+  };
+  const oldSettings=window.settings;
+  window.settings=function(){
+    oldSettings();
+    const sheet=document.querySelector('#modal .sheet');
+    if(!sheet)return;
+    sheet.classList.add('settings-sheet');
+    const title=Array.from(sheet.querySelectorAll('p')).find(x=>x.textContent.trim()==='Акцент');
+    if(title && !sheet.querySelector('.font-section')){
+      const section=document.createElement('div'); section.className='font-section';
+      section.innerHTML=`<div class="settings-title">ШРИФТ</div><div class="font-choice">
+        <button class="${state.fontStyle==='thin'?'selected':''}" onclick="setFontStyle('thin')"><span class="thin-label">Тонкий</span></button>
+        <button class="${state.fontStyle!=='thin'?'selected':''}" onclick="setFontStyle('standard')"><span class="standard-label">Стандартный</span></button>
+      </div>`;
+      title.parentNode.insertBefore(section,title);
+    }
+  };
+  const initialFont=localStorage.getItem('ritmFontStyle')||'standard';
+  state.fontStyle=initialFont;
+  document.body.classList.toggle('font-thin',initialFont==='thin');
+  document.body.classList.toggle('font-standard',initialFont!=='thin');
+})();
+</script>
+
+<style id="ritm-v56-final-polish">
+/* Real gear: use the existing outer gear path only, without the inner circle. */
+.iconbtn:before{content:none!important}
+.iconbtn svg{display:block!important;width:25px!important;height:25px!important;stroke:var(--emerald)!important;fill:none!important}
+.iconbtn svg path:first-child{display:none!important}
+.iconbtn svg path:last-child{display:block!important}
+.iconbtn svg path:last-child{stroke-width:1.65!important}
+/* quieter, more editorial type scale */
+.top h1{font-weight:var(--font-weight-title)!important;letter-spacing:-.045em!important}
+h2,.day-summary{font-weight:var(--font-weight-title)!important;letter-spacing:-.03em!important}
+.daytask .name,.tile .name,.timeline-task-name{font-weight:var(--font-weight-title)!important}
+/* settings visual system */
+.settings-sheet{padding-top:18px!important}
+.settings-sheet .settings-hero{padding:2px 2px 18px}
+.settings-sheet .settings-hero h3{margin:0!important;font-size:30px!important;line-height:34px!important;font-weight:var(--font-weight-title)!important;letter-spacing:-.045em!important}
+.settings-sheet .settings-hero p{margin:5px 0 0!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;line-height:20px!important;font-weight:430!important;color:var(--muted)!important}
+.settings-sheet .settings-section{margin:0 0 22px}
+.settings-sheet .settings-section-title{font-size:11px;line-height:16px;font-weight:650;letter-spacing:.10em;text-transform:uppercase;color:#969194;margin:0 0 9px 2px}
+.settings-sheet .settings-card{border:1px solid var(--glass-line);border-radius:20px;background:rgba(255,255,255,.68);box-shadow:var(--glass-shadow);overflow:hidden}
+.settings-sheet .settings-card .row{min-height:54px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(50,46,48,.055)}
+.settings-sheet .settings-card .row:last-child{border-bottom:0}
+.settings-sheet .row-main{min-width:0}.settings-sheet .row-title{font-size:15px;line-height:20px;font-weight:var(--font-weight-title);color:var(--ink)}
+.settings-sheet .row-sub{font-size:12px;line-height:16px;color:var(--muted);margin-top:1px}
+.settings-sheet .segmented{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:rgba(238,236,233,.86);border:1px solid rgba(255,255,255,.9)}
+.settings-sheet .segmented button{height:34px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:13px;font-weight:600}
+.settings-sheet .segmented button.selected{background:rgba(255,255,255,.92);color:var(--emerald);box-shadow:0 2px 8px rgba(45,41,42,.07),inset 0 1px 0 #fff}
+.settings-sheet .font-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.settings-sheet .font-pair button{height:62px;border:1px solid var(--glass-line);border-radius:18px;background:rgba(255,255,255,.68);box-shadow:var(--glass-shadow);text-align:left;padding:10px 14px;color:var(--ink)}
+.settings-sheet .font-pair button.selected{background:rgba(232,233,232,.88);color:var(--emerald);box-shadow:inset 0 2px 5px rgba(45,41,42,.06),inset 0 1px 0 #fff}
+.settings-sheet .font-pair .thin-label{display:block;font-size:18px;line-height:22px;font-weight:390}.settings-sheet .font-pair .standard-label{display:block;font-size:18px;line-height:22px;font-weight:650}
+.settings-sheet .font-pair small{display:block;margin-top:2px;font-size:11px;color:var(--muted);font-weight:430}
+.settings-sheet .accent-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px}.settings-sheet .accent-pills button{height:48px;border:1px solid var(--glass-line);border-radius:16px;background:rgba(255,255,255,.68);box-shadow:var(--glass-shadow);font-size:14px;font-weight:650}.settings-sheet .accent-pills button.selected{background:rgba(232,233,232,.88);color:var(--emerald);box-shadow:inset 0 2px 5px rgba(45,41,42,.06)}
+.settings-sheet .background-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.settings-sheet .background-grid .opt{min-height:112px!important;padding:8px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-end!important;overflow:hidden!important}.settings-sheet .background-grid .bgthumb{height:70px!important;flex:0 0 70px!important;margin:0 0 7px!important;border-radius:14px!important}.settings-sheet .background-grid .opt{font-size:12px!important;text-align:left!important}.settings-sheet .color-panel{margin-top:8px!important;padding:12px!important;border-radius:18px!important;background:rgba(255,255,255,.48)!important;border:1px solid rgba(255,255,255,.86)!important}.settings-sheet .settings-actions{grid-template-columns:1fr 1fr!important;gap:8px!important}.settings-sheet .settings-action{border:1px solid var(--glass-line)!important;border-radius:16px!important;background:rgba(255,255,255,.68)!important;box-shadow:var(--glass-shadow)!important;min-height:58px!important;padding:11px 12px!important;font-size:13px!important;font-weight:620!important}.settings-sheet .settings-action small{font-size:10px!important;line-height:13px!important;margin-top:3px!important}.settings-sheet .settings-danger{color:#c34b48!important}
+.settings-sheet .category-row input{background:rgba(255,255,255,.68)!important;border:1px solid var(--glass-line)!important;box-shadow:var(--glass-shadow)!important}.settings-sheet .category-row button{background:var(--emerald)!important;box-shadow:0 7px 16px rgba(61,127,115,.14)!important}
+/* no emoji in data/settings actions */
+.settings-sheet .settings-action{font-size:0!important}.settings-sheet .settings-action::first-line{font-size:13px!important}
+</style>
+<script id="ritm-v56-settings-and-appearance">
+(function(){
+  // Keep font selection after theme/accent/background changes.
+  const baseApplyAppearance=window.applyAppearance;
+  window.applyAppearance=function(){
+    if(typeof baseApplyAppearance==='function') baseApplyAppearance();
+    const f=state.fontStyle||localStorage.getItem('ritmFontStyle')||'standard';
+    document.body.classList.toggle('font-thin',f==='thin');
+    document.body.classList.toggle('font-standard',f!=='thin');
+  };
+
+  function fontMarkup(){
+    const f=state.fontStyle||localStorage.getItem('ritmFontStyle')||'standard';
+    return `<div class="settings-section"><div class="settings-section-title">Шрифт</div><div class="font-pair">
+      <button class="${f==='thin'?'selected':''}" onclick="setFontStyle('thin')"><span class="thin-label">Тонкий</span><small>воздушный</small></button>
+      <button class="${f!=='thin'?'selected':''}" onclick="setFontStyle('standard')"><span class="standard-label">Стандартный</span><small>чёткий</small></button>
+    </div></div>`;
+  }
+  window.setFontStyle=function(style){
+    state.fontStyle=style==='thin'?'thin':'standard';
+    localStorage.setItem('ritmFontStyle',state.fontStyle);
+    document.body.classList.toggle('font-thin',state.fontStyle==='thin');
+    document.body.classList.toggle('font-standard',state.fontStyle!=='thin');
+    window.settings();
+  };
+
+  const oldSettings=window.settings;
+  window.settings=function(){
+    const hue=getHueFromHex(state.solidColor||'#d9d3d6');
+    const palette=['#e98d9d','#eaa77a','#e4c56f','#a5bb80','#71b7a3','#74a9c6','#8f9ed0','#aa91c8','#c98cab','#8e6f83','#6f8792','#d38f76'];
+    const bgNames={mist:'Туманное утро',forest:'Тихий лес',sea:'Спокойное море',night:'Ночное небо'};
+    const modal=document.getElementById('modal');
+    modal.innerHTML=`<div class="sheet settings-sheet">
+      <button class="close" onclick="closeM()" aria-label="Закрыть"></button>
+      <div class="settings-hero"><h3>Настройки</h3><p>Настрой «Мой ритм» под себя</p></div>
+      ${fontMarkup()}
+      <div class="settings-section"><div class="settings-section-title">Акцент</div><div class="accent-pills">
+        <button class="${state.accent==='green'?'selected':''}" onclick="setAccent('green')">Изумрудный</button>
+        <button class="${state.accent==='pink'?'selected':''}" onclick="setAccent('pink')">Розовый</button>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-title">Тема</div><div class="segmented">
+        <button class="${state.theme==='day'?'selected':''}" onclick="setTheme('day')">День</button>
+        <button class="${state.theme==='night'?'selected':''}" onclick="setTheme('night')">Ночь</button>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-title">Фон</div><div class="background-grid">
+        ${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?'selected':''}" onclick="setBg('${k}')"><div class="bgthumb" style="background-image:url('${v}')"></div>${bgNames[k]}</button>`).join('')}
+        <button class="opt color-card ${state.bg==='color'?'selected':''}" onclick="setBg('color')"><div class="bgthumb color-preview" style="background:${state.solidColor}"></div>Однотонный</button>
+      </div>
+      <div class="color-panel"><div class="color-swatches">${palette.map(c=>`<button class="color-swatch ${state.solidColor.toLowerCase()===c?'selected':''}" style="background:${c}" aria-label="Выбрать цвет" onclick="setSolidColor('${c}')"></button>`).join('')}</div><div class="picker-hue" id="huePicker"><div class="hue-knob" id="hueKnob"></div></div></div></div>
+      <div class="settings-section"><div class="settings-section-title">Мои категории</div><div class="settings-card"><div class="row"><div class="row-main"><div class="row-title">Новая категория</div><div class="row-sub">Добавь свою группу дел</div></div></div><div style="padding:10px 12px"><div class="category-row"><input id="newCategoryInput" maxlength="24" placeholder="Например, Здоровье"><button type="button" onclick="addCategory()">＋</button></div><div id="categoryManager"></div></div></div></div>
+      <div class="settings-section"><div class="settings-section-title">Память и данные</div><div class="settings-card"><div class="row"><div class="row-main"><div class="row-title">Сохранение</div><div class="row-sub" id="dataStatus"></div></div></div><div style="padding:10px 12px"><div class="settings-actions"><button class="settings-action" onclick="saveNow()">Сохранить сейчас</button><button class="settings-action" onclick="exportData()">Сохранить копию</button><button class="settings-action" onclick="restoreBackup()">Последняя копия</button><button class="settings-action" onclick="importData()">Загрузить копию</button><button class="settings-action settings-danger" onclick="clearPlans()">Очистить планы</button></div><input id="importDataInput" type="file" accept="application/json,.json" style="display:none" onchange="handleImportFile(event)"></div></div></div>
+      <div class="settings-section"><div class="settings-section-title">О приложении</div><div class="settings-card"><div class="row"><div class="row-main"><div class="row-title">Мой ритм</div><div class="row-sub">Данные хранятся на этом устройстве · версия 56</div></div></div></div></div>
+    </div>`;
+    modal.style.display='flex';
+    positionHue(hue);attachHuePicker();renderCategoryManager();updateDataStatus();updateGlobalNav?.();
+  };
+
+  // apply the selected font immediately on load.
+  const initial=localStorage.getItem('ritmFontStyle')||'standard';
+  state.fontStyle=initial;
+  document.body.classList.toggle('font-thin',initial==='thin');
+  document.body.classList.toggle('font-standard',initial!=='thin');
+})();
+</script>
 </html>
 <style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
 
