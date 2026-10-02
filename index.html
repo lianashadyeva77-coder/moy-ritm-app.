@@ -11,7 +11,7 @@
 :root{--accent:#2f7668;--pink:#e49bb5;--green:#2f7668;--bg:#f7f5f4;--text:#292729;--muted:#918d90;--card:#fff;--line:#e9e3e5}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:540px;margin:auto;min-height:100vh;padding:18px 16px 108px}
+body{min-height:100vh}button{font-family:inherit;color:inherit}.app{max-width:540px;margin:auto;min-height:100vh;padding:18px 16px calc(88px + env(safe-area-inset-bottom))}
 .top{display:flex;align-items:center;justify-content:space-between}.top h1{font-size:25px;line-height:1;margin:5px 0 18px;text-transform:uppercase;letter-spacing:.035em}.iconbtn{border:0;background:none;font-size:30px;line-height:1;color:var(--accent);padding:6px}
 
 /* FIXED CENTER PILL: dates move underneath it */
@@ -49,9 +49,9 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .plus{margin-left:auto;flex:0 0 24px;color:var(--accent);font-size:21px;font-weight:700;text-align:center}
 .empty{color:var(--muted);font-size:14px;padding:4px 2px}
 
-.nav{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);width:min(508px,calc(100% - 24px));background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:28px;padding:8px;display:flex;justify-content:space-around;z-index:10;box-shadow:0 7px 25px rgba(0,0,0,.08)}.nav button{border:0;background:none;padding:9px 17px;color:var(--muted);font-size:13px}.nav .sel{color:var(--text);font-weight:700}
+.nav{position:fixed;left:0;right:0;bottom:0;transform:none;width:100%;height:calc(68px + env(safe-area-inset-bottom));padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:0;border-top:1px solid var(--line);border-radius:22px 22px 0 0;display:flex;align-items:flex-start;justify-content:space-around;z-index:300;box-shadow:0 -6px 24px rgba(0,0,0,.07);}.nav button{border:0;background:none;padding:10px 8px 8px;min-width:68px;color:var(--muted);font-size:13px;line-height:1.2}.nav .sel{color:var(--text);font-weight:700}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;align-items:flex-end;z-index:80}.sheet{background:var(--bg);width:100%;max-height:91vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;align-items:flex-end;z-index:80}.sheet{background:var(--bg);width:100%;max-height:91vh;border-radius:30px 30px 0 0;padding:18px 18px calc(100px + env(safe-area-inset-bottom));overflow:auto}
 .settings-block{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
 .settings-title{font-size:15px;font-weight:700;margin:0 0 10px}
 .settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -69,7 +69,7 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .year-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px} .month-sheet{max-height:68vh;overflow:hidden;touch-action:none;transform:translateY(0);transition:max-height .28s cubic-bezier(.2,.8,.2,1)}
 .month-sheet.expanded{max-height:92vh;overflow:auto}
 .sheet-handle{width:38px;height:5px;border-radius:99px;background:#c9c4c6;margin:0 auto 12px;opacity:.8}
-.month-sheet-body{overflow:auto;max-height:calc(68vh - 70px);padding-bottom:20px}
+.month-sheet-body{overflow:auto;max-height:calc(68vh - 70px);padding-bottom:100px}
 .month-sheet.expanded .month-sheet-body{max-height:calc(92vh - 70px)}
 .year-reveal{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
 .year-reveal-title{font-size:18px;font-weight:700;margin:0 0 12px}
@@ -99,8 +99,8 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 
 .month-head{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}.month-head div{text-align:center;color:var(--muted);font-size:12px}.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.mday{border:0;background:var(--card);border-radius:15px;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;color:var(--text)}.mday .count{font-size:9px;color:var(--muted);margin-top:3px}.mday.empty{background:transparent}.mday.current{background:var(--accent);color:#fff}.mday.today:not(.current){outline:2px solid var(--accent)}.mday.current .count{color:rgba(255,255,255,.8)}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}.opt{background:var(--card);border:2px solid transparent;border-radius:18px;padding:12px;text-align:left}.opt.selected{border-color:var(--accent)}.bgthumb{height:82px;border-radius:13px;margin-bottom:8px;background-size:cover;background-position:center}
-.dark{--bg:#171719;--text:#f4f1f2;--card:#242426;--line:#353438}.dark .nav{background:rgba(35,35,38,.94)}
-.day-screen{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;overflow:auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom))}.day-screen.open{display:block}.day-head{display:flex;align-items:center;gap:12px;margin-bottom:25px}.back{border:0;background:var(--card);width:42px;height:42px;border-radius:50%;font-size:25px;color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.06)}.day-title{font-size:26px;font-weight:700;letter-spacing:-.025em}.day-subtitle{font-size:14px;color:var(--muted);margin-top:3px}.detail-list{display:flex;flex-direction:column;gap:10px}.detail-empty{padding:55px 15px;text-align:center;color:var(--muted);font-size:16px}.detail-add{margin-top:18px;border:0;width:100%;height:54px;border-radius:18px;background:var(--accent);color:white;font-size:16px;font-weight:650}.add-sheet{background:var(--bg);width:100%;max-height:82vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto;position:relative}.add-sheet-head{position:sticky;top:-18px;z-index:5;margin:-18px -18px 15px;padding:18px 18px 12px;background:var(--bg);border-radius:30px 30px 0 0;display:flex;align-items:center;gap:10px}.add-sheet-head h3{font-size:22px;margin:0;flex:1}.add-sheet-head .close{float:none;flex:0 0 42px;width:42px;height:42px;font-size:25px}
+.dark{--bg:#171719;--text:#f4f1f2;--card:#242426;--line:#353438}.dark .nav{background:rgba(35,35,38,.96);border-top-color:#353438}
+.day-screen{position:fixed;inset:0;background:var(--bg);z-index:30;display:none;overflow:auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(92px + env(safe-area-inset-bottom))}.day-screen.open{display:block}.day-head{display:flex;align-items:center;gap:12px;margin-bottom:25px}.back{border:0;background:var(--card);width:42px;height:42px;border-radius:50%;font-size:25px;color:var(--text);box-shadow:0 2px 10px rgba(0,0,0,.06)}.day-title{font-size:26px;font-weight:700;letter-spacing:-.025em}.day-subtitle{font-size:14px;color:var(--muted);margin-top:3px}.detail-list{display:flex;flex-direction:column;gap:10px}.detail-empty{padding:55px 15px;text-align:center;color:var(--muted);font-size:16px}.detail-add{margin-top:18px;border:0;width:100%;height:54px;border-radius:18px;background:var(--accent);color:white;font-size:16px;font-weight:650}.add-sheet{background:var(--bg);width:100%;max-height:82vh;border-radius:30px 30px 0 0;padding:18px;overflow:auto;position:relative}.add-sheet-head{position:sticky;top:-18px;z-index:5;margin:-18px -18px 15px;padding:18px 18px 12px;background:var(--bg);border-radius:30px 30px 0 0;display:flex;align-items:center;gap:10px}.add-sheet-head h3{font-size:22px;margin:0;flex:1}.add-sheet-head .close{float:none;flex:0 0 42px;width:42px;height:42px;font-size:25px}
 
 
 .custom-task-create{margin-top:12px;width:100%;height:52px;border:1px dashed var(--line);border-radius:17px;background:transparent;color:var(--accent);font-size:16px;font-weight:650}
@@ -152,7 +152,7 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .period-task-score{font-size:13px}
 .period-task-detail{font-size:11px;margin:3px 0 0 35px}
 .period-task-bar{height:5px;margin:7px 0 0 35px}
-.period-nav{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(508px,calc(100% - 24px));z-index:200}
+.period-nav{position:fixed;left:0;right:0;bottom:0;transform:none;width:100%;z-index:301}
 .day-screen .period-nav{z-index:200}
 .period-screen{padding-bottom:calc(118px + env(safe-area-inset-bottom))}
 </style>
@@ -466,7 +466,7 @@ let d=dateFrom(state.date),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1
 for(let i=0;i<lead;i++)cells+=`<div class="mday empty"></div>`;
 for(let n=1;n<=days;n++){let s=`${y}-${pad(m+1)}-${pad(n)}`,a=state.plans[s]||[];cells+=`<button class="mday ${s===state.date?"current":""} ${s===todayKey?"today":""}" onclick="openDay('${s}')">${n}<span class="count">${a.length?a.length+" дел.":""}</span></button>`}
 const modal=document.getElementById("modal");
-modal.innerHTML=`<div class="sheet month-sheet" id="monthSheet"><div class="sheet-handle" id="sheetHandle"></div><div class="month-sheet-head"><button class="sheet-back" onclick="yearView()">‹</button><h3>${d.toLocaleDateString("ru-RU",{month:"long",year:"numeric"})}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-sheet-body" id="monthSheetBody"><div class="month-head"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div><div class="month-grid">${cells}</div><div class="year-reveal"><div class="year-reveal-title">${y}</div>${buildYearGrid(y)}</div></div></div>`;
+modal.innerHTML=`<div class="sheet month-sheet" id="monthSheet"><div class="sheet-handle" id="sheetHandle"></div><div class="month-sheet-head"><button class="sheet-back" onclick="yearView()">‹</button><h3>${d.toLocaleDateString("ru-RU",{month:"long",year:"numeric"})}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-sheet-body" id="monthSheetBody"><div class="month-head"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div><div class="month-grid">${cells}</div><div class="year-reveal"><div class="year-reveal-title">${y}</div>${buildYearGrid(y)}</div></div></div><div class="nav month-nav"><button onclick="closeM();render()">День</button><button class="sel">Месяц</button><button onclick="closeM();openPeriodStats()">Итоги</button><button onclick="closeM();settings()">Настройки</button></div></div>`;
 modal.style.display="flex";modal.onclick=e=>{if(e.target===modal)closeM()};attachMonthSheetGesture();
 }
 function buildYearGrid(y){
@@ -482,7 +482,7 @@ return `<div class="year-grid">${months}</div>`;
 function yearView(){
 const d=dateFrom(state.date),y=d.getFullYear();
 const modal=document.getElementById("modal");
-modal.innerHTML=`<div class="sheet month-sheet expanded" id="monthSheet"><div class="sheet-handle"></div><div class="month-sheet-head"><button class="sheet-back" onclick="month()">‹</button><h3>${y}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-sheet-body">${buildYearGrid(y)}</div></div>`;
+modal.innerHTML=`<div class="sheet month-sheet expanded" id="monthSheet"><div class="sheet-handle"></div><div class="month-sheet-head"><button class="sheet-back" onclick="month()">‹</button><h3>${y}</h3><button class="close" onclick="closeM()">×</button></div><div class="month-sheet-body">${buildYearGrid(y)}</div></div><div class="nav month-nav"><button onclick="closeM();render()">День</button><button class="sel">Месяц</button><button onclick="closeM();openPeriodStats()">Итоги</button><button onclick="closeM();settings()">Настройки</button></div></div>`;
 modal.style.display="flex";modal.onclick=e=>{if(e.target===modal)closeM()};
 attachMonthSheetGesture();
 }
@@ -899,7 +899,7 @@ ${Object.entries(photos).map(([k,v])=>`<button class="opt ${state.bg===k?"select
 <div class="settings-block"><div class="settings-title">Мои категории</div><div class="category-row"><input id="newCategoryInput" maxlength="24" placeholder="Например, Здоровье"><button type="button" onclick="addCategory()">＋</button></div><div id="categoryManager"></div></div>
 <div class="settings-block"><div class="settings-title">Память и данные</div><div id="dataStatus" class="data-status"></div><div class="settings-actions"><button class="settings-action" onclick="saveNow()">💾 Сохранить сейчас<small>Записать всё в память приложения</small></button><button class="settings-action" onclick="exportData()">📤 Сохранить копию<small>Файл для восстановления</small></button><button class="settings-action" onclick="restoreBackup()">↩️ Последняя копия<small>Вернуть последнее сохранение</small></button><button class="settings-action" onclick="importData()">📥 Загрузить копию<small>Восстановить JSON-файл</small></button><button class="settings-action settings-danger" onclick="clearPlans()">Очистить планы<small>Удалит планы, но не библиотеку</small></button></div><input id="importDataInput" type="file" accept="application/json,.json" style="display:none" onchange="handleImportFile(event)"></div>
 <div class="settings-block"><div class="settings-title">О приложении</div><div class="data-status">«Мой ритм» · версия 39<br>Данные хранятся на этом устройстве.</div></div>
-</div>`;
+<div class="nav settings-nav"><button onclick="closeM();render()">День</button><button onclick="closeM();month()">Месяц</button><button onclick="closeM();openPeriodStats()">Итоги</button><button class="sel">Настройки</button></div></div>`;
 document.getElementById("modal").style.display="flex";
 positionHue(hue);attachHuePicker();renderCategoryManager();updateDataStatus();
 }
@@ -942,3 +942,4 @@ persistData();
 applyAppearance();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js?v=40");
 </script>
 </body></html>
+<style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
