@@ -453,21 +453,9 @@ attachDayTaskSwipe(box);
 
 
 function taskGlyph(id){
-  const t=allTasks().find(x=>x[0]===id), name=(t?.[1]||'').toLowerCase();
-  let path='';
-  if(/акробат|спорт|йог|трен/.test(name)) path='<path d="M8 17c2-4 4-7 8-10"/><path d="M11 7l-3-3M11 7l4 1M8 17l-4 2M8 17l3 3"/><circle cx="16.5" cy="6" r="1.7"/>';
-  else if(/читать|чтени|книг|уч[её]б/.test(name)) path='<path d="M4.5 5.5A2.5 2.5 0 0 1 7 3h11v16H7a2.5 2.5 0 0 0-2.5 2.5z"/><path d="M4.5 5.5v16M8 7h7M8 11h7"/>';
-  else if(/посуд|мыть/.test(name)) path='<path d="M5 10h14"/><path d="M6 10c.6 6 2.6 9 6 9s5.4-3 6-9"/><path d="M9 5c0-1.5 1-2.5 1-4M13 5c0-1.5 1-2.5 1-4"/>';
-  else if(/готов|обед|ужин|завтрак|еда/.test(name)) path='<path d="M5 10h14"/><path d="M6 10c.4 5 2.5 8 6 8s5.6-3 6-8"/><path d="M8 21h8"/>';
-  else if(/пылесос|убор|туалет|кухн/.test(name)) path='<path d="M8 4h4l5 13H8z"/><path d="M8 17H5a2 2 0 0 0-2 2v1h10v-1a2 2 0 0 0-2-2"/><path d="M12 4V2h3"/>';
-  else if(/стир|сушил|бель/.test(name)) path='<rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6h.01M11 6h.01"/>';
-  else if(/игра|лео|реб[её]нок|ребёнок/.test(name)) path='<path d="M7 8h10a4 4 0 0 1 4 4v3a3 3 0 0 1-5 2l-2-2H10l-2 2a3 3 0 0 1-5-2v-3a4 4 0 0 1 4-4Z"/><path d="M8 12v4M6 14h4M16 13h.01M19 15h.01"/>';
-  else if(/массаж/.test(name)) path='<path d="M8 4c2 0 3 2 3 4s-1 4-3 4-3-2-3-4 1-4 3-4Z"/><path d="M11 10l5 3 4-2M8 12v7M5 21l3-2 3 2"/>';
-  else if(/сериал|фильм|кино/.test(name)) path='<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>';
-  else if(/звон|телефон/.test(name)) path='<path d="M7 4 4.5 6.5c2 6 5 9 11 11L18 15l-3-2-2 2c-2-1-3-2-4-4l2-2z"/>';
-  else if(/ванн|душ/.test(name)) path='<path d="M4 12h16M6 12V7a4 4 0 0 1 8 0v1M14 8h4"/><path d="M8 15v.01M11 17v.01M15 15v.01M18 18v.01"/>';
-  else path='<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 13h8M8 17h5"/>';
-  return `<svg class="task-glyph" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+  const t=allTasks().find(x=>x[0]===id);
+  const emoji=(t && t[2]) ? String(t[2]).trim() : "📝";
+  return escapeHtml(emoji);
 }
 
 function dayTaskMarkup(p,i){
@@ -1012,53 +1000,144 @@ function exportData(){
 }
 function exportAnalysis(){
   persistData();
-  const dates=Object.keys(state.plans||{}).filter(k=>Array.isArray(state.plans[k])).sort();
+  const today = todayKey;
+  const allDates=Object.keys(state.plans||{})
+    .filter(k=>Array.isArray(state.plans[k]))
+    .sort();
+  const pastDates=allDates.filter(k=>k<today);
+  const todayPlans=Array.isArray(state.plans[today])?state.plans[today]:[];
+  const futureDates=allDates.filter(k=>k>today);
   const libMap=new Map(allTasks().map(t=>[t[0],t]));
-  let total=0,done=0;
+
+  let pastTotal=0,pastDone=0;
+  let todayTotal=todayPlans.length,todayDone=todayPlans.filter(p=>p.done).length;
+  let futureTotal=0;
   const catStats={},taskStats={};
-  dates.forEach(ds=>{(state.plans[ds]||[]).forEach(p=>{
-    const lib=libMap.get(p.id); const cat=(lib&&lib[3])||p.category||'Без раздела'; const name=p.name||(lib&&lib[1])||'Дело';
-    total++; if(p.done)done++;
-    catStats[cat]??={planned:0,done:0}; catStats[cat].planned++; if(p.done)catStats[cat].done++;
-    taskStats[name]??={planned:0,done:0,category:cat}; taskStats[name].planned++; if(p.done)taskStats[name].done++;
-  })});
-  const pct=total?Math.round(done/total*100):0;
+
+  const getMeta=(p)=>{
+    const lib=libMap.get(p.id);
+    return {
+      cat:(lib&&lib[3])||p.category||'Без раздела',
+      name:p.name||(lib&&lib[1])||'Дело'
+    };
+  };
+
+  pastDates.forEach(ds=>{
+    (state.plans[ds]||[]).forEach(p=>{
+      const {cat,name}=getMeta(p);
+      pastTotal++;
+      if(p.done)pastDone++;
+      catStats[cat]??={planned:0,done:0};
+      catStats[cat].planned++;
+      if(p.done)catStats[cat].done++;
+      taskStats[name]??={planned:0,done:0,category:cat};
+      taskStats[name].planned++;
+      if(p.done)taskStats[name].done++;
+    });
+  });
+
+  futureDates.forEach(ds=>futureTotal+=(state.plans[ds]||[]).length);
+
+  const pastPct=pastTotal?Math.round(pastDone/pastTotal*100):0;
+  const todayPct=todayTotal?Math.round(todayDone/todayTotal*100):0;
   const lines=[];
+  const fmtDate=(ds)=>dateFrom(ds).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const fmtTime=(p)=>p.time?(p.time+(p.timeEnd?`–${p.timeEnd}`:'')):'без времени';
+
   lines.push('# Мой ритм — данные для анализа продуктивности');
   lines.push('');
   lines.push(`Экспорт: ${new Date().toLocaleString('ru-RU')}`);
-  lines.push(`Период с планами: ${dates[0]||'—'} → ${dates[dates.length-1]||'—'}`);
+  lines.push(`Сегодня: ${today}`);
+  lines.push(`Планы в файле: ${allDates[0]||'—'} → ${allDates[allDates.length-1]||'—'}`);
   lines.push('');
-  lines.push('## Общая статистика');
-  lines.push(`- Запланировано: ${total}`);
-  lines.push(`- Выполнено: ${done}`);
-  lines.push(`- Выполнение: ${pct}%`);
-  lines.push(`- Дней с планами: ${dates.length}`);
+
+  lines.push('## ВАЖНО ДЛЯ АНАЛИЗА');
+  lines.push('- Прошедшие дни — даты раньше сегодняшней даты. Только они используются для расчёта исторической продуктивности.');
+  lines.push('- Сегодняшний день показывается отдельно и НЕ считается пропущенным для незавершённых дел.');
+  lines.push('- Будущие планы показываются отдельно и НЕ входят в процент выполнения.');
   lines.push('');
-  lines.push('## По категориям');
-  Object.entries(catStats).sort((a,b)=>b[1].planned-a[1].planned).forEach(([cat,v])=>lines.push(`- **${cat}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%)`));
+
+  lines.push('## Историческая статистика');
+  lines.push(`- Прошедшие дни с планами: ${pastDates.filter(ds=>(state.plans[ds]||[]).length>0).length}`);
+  lines.push(`- Запланировано в прошедшие дни: ${pastTotal}`);
+  lines.push(`- Выполнено в прошедшие дни: ${pastDone}`);
+  lines.push(`- Выполнение в прошедшие дни: ${pastPct}%`);
   lines.push('');
-  lines.push('## По делам');
-  Object.entries(taskStats).sort((a,b)=>b[1].planned-a[1].planned).forEach(([name,v])=>lines.push(`- **${name}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%), категория: ${v.category}`));
+
+  lines.push('## Сегодня');
+  lines.push(`- ${fmtDate(today)}`);
+  lines.push(`- Запланировано сегодня: ${todayTotal}`);
+  lines.push(`- Выполнено сегодня: ${todayDone}`);
+  lines.push(`- Выполнение на момент экспорта: ${todayPct}%`);
+  lines.push(`- Незавершено сегодня: ${Math.max(0,todayTotal-todayDone)} — НЕ считать пропущенным, день ещё идёт.`);
   lines.push('');
+
+  lines.push('## Будущие планы');
+  lines.push(`- Дней с будущими планами: ${futureDates.filter(ds=>(state.plans[ds]||[]).length>0).length}`);
+  lines.push(`- Запланировано будущих дел: ${futureTotal}`);
+  lines.push('- Эти дела НЕ входят в статистику продуктивности.');
+  lines.push('');
+
+  lines.push('## По категориям — только прошедшие дни');
+  if(Object.keys(catStats).length){
+    Object.entries(catStats)
+      .sort((a,b)=>b[1].planned-a[1].planned)
+      .forEach(([cat,v])=>lines.push(`- **${cat}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%)`));
+  }else lines.push('- Пока нет завершённых дней с планами для расчёта.');
+  lines.push('');
+
+  lines.push('## По делам — только прошедшие дни');
+  if(Object.keys(taskStats).length){
+    Object.entries(taskStats)
+      .sort((a,b)=>b[1].planned-a[1].planned)
+      .forEach(([name,v])=>lines.push(`- **${name}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%), категория: ${v.category}`));
+  }else lines.push('- Пока нет завершённых дней с планами для расчёта.');
+  lines.push('');
+
   lines.push('## Подробно по дням');
-  dates.forEach(ds=>{
-    const a=state.plans[ds]||[]; const d=dateFrom(ds); const title=d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    lines.push(`### ${title} (${ds})`);
+  allDates.forEach(ds=>{
+    const a=state.plans[ds]||[];
+    const title=fmtDate(ds);
+    const status=ds<today?'ПРОШЕДШИЙ ДЕНЬ':(ds===today?'СЕГОДНЯ':'БУДУЩИЙ ДЕНЬ');
+    lines.push(`### ${title} (${ds}) — ${status}`);
     if(!a.length){lines.push('- Нет дел');lines.push('');return;}
     a.forEach(p=>{
-      const lib=libMap.get(p.id); const cat=(lib&&lib[3])||p.category||'Без раздела'; const time=p.time?(p.time+(p.timeEnd?`–${p.timeEnd}`:'')):'без времени';
-      lines.push(`- [${p.done?'x':' '}] ${p.name||'Дело'} — ${time} — ${cat}${p.reminder?' — напоминание за 1 час':''}`);
+      const {cat,name}=getMeta(p);
+      const time=fmtTime(p);
+      let mark='[ ]';
+      let stateLabel='не выполнено';
+      if(ds<today){
+        mark=p.done?'[x]':'[ ]';
+        stateLabel=p.done?'выполнено':'не выполнено / пропущено';
+      }else if(ds===today){
+        mark=p.done?'[x]':'[ ]';
+        stateLabel=p.done?'выполнено сегодня':'ещё не выполнено — не считать пропуском';
+      }else{
+        mark='[→]';
+        stateLabel='будущее — не учитывать в продуктивности';
+      }
+      lines.push(`- ${mark} ${name} — ${time} — ${cat} — ${stateLabel}${p.reminder?' — напоминание за 1 час':''}`);
     });
     lines.push('');
   });
+
   lines.push('## Библиотека дел');
   allTasks().forEach(t=>lines.push(`- ${t[1]} — ${t[3]||'Без раздела'}`));
   lines.push('');
+
   lines.push('## Как анализировать');
-  lines.push('Попроси ChatGPT оценить динамику выполнения, перегрузку по дням и категориям, повторяющиеся пропуски, лучшие и слабые привычки, распределение дел по времени, а также предложить реалистичные изменения без увеличения нагрузки.');
+  lines.push('Анализируй историческую продуктивность только по прошедшим дням. Не смешивай сегодняшние незавершённые дела и будущие планы с пропусками.');
+  lines.push('Отдельно оцени: перегрузку по дням, повторяющиеся пропуски, устойчивые привычки, категории с высокой и низкой фактической выполнимостью, дела без времени и дела со временем.');
+  lines.push('Для будущих планов оценивай только объём и потенциальную нагрузку, но не называй их невыполненными.');
+  lines.push('Предлагай реалистичные изменения без автоматического увеличения количества задач.');
+
   const blob=new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`moy-ritm-productivity-${new Date().toISOString().slice(0,10)}.md`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`moy-ritm-productivity-${today}.md`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function importData(){
  const input=document.getElementById("importDataInput");if(input)input.click();
@@ -1555,6 +1634,26 @@ h2,.day-summary{font-weight:var(--font-weight-title)!important;letter-spacing:-.
   document.body.classList.toggle('font-standard',initial!=='thin');
 })();
 </script>
+
+<style id="ritm-v59-emoji-restore">
+/* v59 — вернуть пользовательские emoji как основной визуальный идентификатор дел */
+.daytask .taskemoji,.tile .tileemoji{
+  display:grid!important;
+  place-items:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:inherit!important;
+  border-radius:0!important;
+  font-family:inherit!important;
+}
+.daytask .taskemoji{width:36px!important;min-width:36px!important;height:36px!important;flex:0 0 36px!important;font-size:28px!important;line-height:1!important}
+.tile .tileemoji{width:38px!important;min-width:38px!important;height:38px!important;flex:0 0 38px!important;font-size:29px!important;line-height:1!important}
+.daytask .left{gap:12px!important}
+.tile{gap:12px!important}
+</style>
 </html>
 <style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
 
