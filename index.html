@@ -1796,3 +1796,45 @@ h2{font-size:20px!important;line-height:26px!important;margin:26px 0 12px!import
 .library-task-delete{left:auto!important;right:0!important;top:0!important;bottom:0!important;width:76px!important;height:100%!important;min-width:76px!important;padding:0!important;justify-content:center!important}
 .library-task-delete svg{width:21px!important;height:21px!important}
 </style>
+
+<style id="ritm-v60-accent-system">
+/* v60 — selected accent drives every accent-colored component */
+:root{--emerald:var(--accent);}
+.progress .bar i{background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 68%,white))!important;box-shadow:0 0 10px var(--accent-shadow)!important}
+.daytask.done .check{background:var(--accent)!important;border-color:var(--accent)!important}
+.tile.selected .tileemoji{background:var(--accent-soft)!important;color:var(--accent)!important}
+.tile.selected .name{color:var(--accent)!important}
+.tile .plus{color:var(--accent)!important}
+.task-category-title .dot{background:var(--accent)!important;box-shadow:0 0 8px var(--accent-shadow)!important}
+.custom-task-create{color:var(--accent)!important}
+#globalNav button.sel{color:var(--accent)!important}
+.sheet .opt.selected{color:var(--accent)!important}
+.mday.current{background:var(--accent)!important;box-shadow:0 8px 18px var(--accent-shadow)!important}
+.timeline-list:before{background:linear-gradient(to bottom,color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--accent) 42%,transparent),color-mix(in srgb,var(--accent) 10%,transparent))!important}
+.timeline-node:after{background:var(--accent)!important}
+.timeline-item.done .timeline-node{background:var(--accent)!important;box-shadow:0 0 0 1px var(--accent-soft),0 0 14px var(--accent-glow)!important}
+.timeline-item.done .timeline-check{background:var(--accent)!important;border-color:var(--accent)!important;box-shadow:0 0 10px var(--accent-glow)!important}
+.detail-add{color:var(--accent)!important}
+.time-save{background:var(--accent)!important}
+.reminder-note,.time-range-note{color:var(--accent)!important;background:var(--accent-soft)!important}
+.settings-sheet .category-row button{background:var(--accent)!important;box-shadow:0 7px 16px var(--accent-shadow)!important}
+.settings-sheet .accent-choice.selected{color:var(--accent)!important}
+.settings-sheet .font-pair button.selected{color:var(--accent)!important}
+.settings-sheet .segmented button.selected{color:var(--accent)!important}
+</style>
+<script id="ritm-v60-accent-runtime">
+(function(){
+  const prev=window.applyAppearance;
+  window.applyAppearance=function(){
+    if(typeof prev==='function') prev();
+    const map={
+      green:'#2f7668',pink:'#d985a3',lavender:'#8b82bd',sky:'#6d9fbe',peach:'#d58f73',butter:'#c4a044'
+    };
+    const main=map[state?.accent]||map.green;
+    document.documentElement.style.setProperty('--emerald',main);
+    document.documentElement.style.setProperty('--accent',main);
+  };
+  window.applyAppearance();
+  if(typeof window.render==='function') window.render();
+})();
+</script>
