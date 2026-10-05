@@ -200,7 +200,7 @@ h2{font-size:19px;margin:18px 0 10px}.added{display:flex;flex-direction:column;g
 .calendar-date{gap:6px}
 .calendar-date .dow{font-size:14px;line-height:18px;font-weight:500}
 .calendar-date .num{font-size:26px;line-height:28px;font-weight:650;letter-spacing:-.02em}
-.center-pill{height:88px;border-radius:30px;box-shadow:0 5px 14px rgba(47,118,104,.12)}
+.center-pill{height:88px;border-radius:30px;box-shadow:0 5px 14px rgba(var(--accent-rgb),.12)}
 .center-pill .pill-dow{top:25px;font-size:14px;line-height:18px}
 .center-pill .pill-num{top:48px;font-size:26px;line-height:28px}
 .progress{height:176px;margin:0 0 24px;padding:20px 22px;border-radius:24px}
@@ -274,8 +274,84 @@ h2{font-size:20px;line-height:28px;margin:24px 0 12px;letter-spacing:-.02em}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.95), inset 0 0 0 1px rgba(255,255,255,.38);
 }
 .progress .today-title,.progress .pct,.progress .sub,.progress .bar{position:relative;z-index:2;}
-.progress .bar{background:rgba(47,118,104,.11) !important;}
-.progress .bar i{background:linear-gradient(90deg,var(--emerald),#73a79d) !important;box-shadow:0 0 9px rgba(61,127,115,.16) !important;}
+.progress .bar{background:rgba(var(--accent-rgb),.11) !important;}
+.progress .bar i{background:linear-gradient(90deg,var(--accent),#73a79d) !important;box-shadow:0 0 9px rgba(var(--accent-rgb),.16) !important;}
+</style>
+
+<style id="ritm-v59-accent-unification">
+/* v59 — selected accent is the single source of color truth */
+:root{--emerald:var(--accent);--accent-rgb:47,118,104}
+.progress .bar i,
+.period-bar i,
+.period-cat-bar i,
+.period-rhythm-bar,
+.done .check,
+.timeline-item.done .timeline-node,
+.timeline-item.done .timeline-check,
+.detail-add,
+.category-row button,
+.custom-save,
+.time-save,
+.center-pill,
+.mday.current{
+  background-color:var(--accent)!important;
+}
+.progress .bar i{
+  background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 70%,white))!important;
+}
+.daytask .taskemoji,
+.tile .tileemoji{
+  color:var(--accent)!important;
+  background:rgba(var(--accent-rgb),.08)!important;
+}
+.tile.selected .tileemoji{
+  color:var(--accent)!important;
+  background:rgba(var(--accent-rgb),.12)!important;
+}
+.timeline-list:before{
+  background:linear-gradient(to bottom,
+    rgba(var(--accent-rgb),.12),
+    rgba(var(--accent-rgb),.40),
+    rgba(var(--accent-rgb),.08))!important;
+}
+.timeline-node{
+  box-shadow:0 0 0 1px rgba(var(--accent-rgb),.24),0 4px 10px rgba(53,48,43,.06)!important;
+}
+.timeline-item.done .timeline-node{
+  box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12),0 0 14px var(--accent-glow)!important;
+}
+.timeline-item.done .timeline-check{
+  box-shadow:0 0 10px var(--accent-glow)!important;
+}
+.detail-add{color:var(--accent)!important}
+.sheet .opt.selected,
+.settings-sheet .accent-choice.selected{
+  color:var(--accent)!important;
+}
+.sheet .opt.selected{box-shadow:0 0 0 2px var(--accent-soft),var(--shadow-soft)!important}
+.settings-sheet .category-row button{
+  background:var(--accent)!important;
+  box-shadow:0 7px 16px var(--accent-shadow)!important;
+}
+.settings-sheet .accent-choice.selected{
+  box-shadow:0 0 0 2px var(--accent-soft),var(--glass-shadow)!important;
+}
+.settings-sheet .accent-choice.selected i{
+  box-shadow:0 0 0 3px rgba(255,255,255,.9),0 0 0 5px var(--accent-soft),0 3px 10px rgba(45,41,42,.12)!important;
+}
+#globalNav button.sel{color:var(--accent)!important}
+.opt.selected{border-color:var(--accent)!important}
+.category-select:focus,.custom-input:focus{
+  border-color:var(--accent)!important;
+  box-shadow:0 0 0 3px var(--selected-bg)!important;
+}
+.time-btn.set{color:var(--accent)!important}
+.reminder-note,.period-advice,.period-today-note{
+  color:var(--accent)!important;
+  border-color:var(--accent)!important;
+}
+.period-chart .done-bar,.legend-done{background:var(--accent)!important}
+.period-composition-item .period-dot{background:var(--accent)!important}
 </style>
 </head>
 <body><div id="app"></div><nav id="globalNav" aria-label="Основная навигация"><div class="global-nav-inner">
@@ -453,9 +529,21 @@ attachDayTaskSwipe(box);
 
 
 function taskGlyph(id){
-  const t=allTasks().find(x=>x[0]===id);
-  const emoji=(t && t[2]) ? String(t[2]).trim() : "📝";
-  return escapeHtml(emoji);
+  const t=allTasks().find(x=>x[0]===id), name=(t?.[1]||'').toLowerCase();
+  let path='';
+  if(/акробат|спорт|йог|трен/.test(name)) path='<path d="M8 17c2-4 4-7 8-10"/><path d="M11 7l-3-3M11 7l4 1M8 17l-4 2M8 17l3 3"/><circle cx="16.5" cy="6" r="1.7"/>';
+  else if(/читать|чтени|книг|уч[её]б/.test(name)) path='<path d="M4.5 5.5A2.5 2.5 0 0 1 7 3h11v16H7a2.5 2.5 0 0 0-2.5 2.5z"/><path d="M4.5 5.5v16M8 7h7M8 11h7"/>';
+  else if(/посуд|мыть/.test(name)) path='<path d="M5 10h14"/><path d="M6 10c.6 6 2.6 9 6 9s5.4-3 6-9"/><path d="M9 5c0-1.5 1-2.5 1-4M13 5c0-1.5 1-2.5 1-4"/>';
+  else if(/готов|обед|ужин|завтрак|еда/.test(name)) path='<path d="M5 10h14"/><path d="M6 10c.4 5 2.5 8 6 8s5.6-3 6-8"/><path d="M8 21h8"/>';
+  else if(/пылесос|убор|туалет|кухн/.test(name)) path='<path d="M8 4h4l5 13H8z"/><path d="M8 17H5a2 2 0 0 0-2 2v1h10v-1a2 2 0 0 0-2-2"/><path d="M12 4V2h3"/>';
+  else if(/стир|сушил|бель/.test(name)) path='<rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6h.01M11 6h.01"/>';
+  else if(/игра|лео|реб[её]нок|ребёнок/.test(name)) path='<path d="M7 8h10a4 4 0 0 1 4 4v3a3 3 0 0 1-5 2l-2-2H10l-2 2a3 3 0 0 1-5-2v-3a4 4 0 0 1 4-4Z"/><path d="M8 12v4M6 14h4M16 13h.01M19 15h.01"/>';
+  else if(/массаж/.test(name)) path='<path d="M8 4c2 0 3 2 3 4s-1 4-3 4-3-2-3-4 1-4 3-4Z"/><path d="M11 10l5 3 4-2M8 12v7M5 21l3-2 3 2"/>';
+  else if(/сериал|фильм|кино/.test(name)) path='<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>';
+  else if(/звон|телефон/.test(name)) path='<path d="M7 4 4.5 6.5c2 6 5 9 11 11L18 15l-3-2-2 2c-2-1-3-2-4-4l2-2z"/>';
+  else if(/ванн|душ/.test(name)) path='<path d="M4 12h16M6 12V7a4 4 0 0 1 8 0v1M14 8h4"/><path d="M8 15v.01M11 17v.01M15 15v.01M18 18v.01"/>';
+  else path='<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 13h8M8 17h5"/>';
+  return `<svg class="task-glyph" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
 }
 
 function dayTaskMarkup(p,i){
@@ -732,6 +820,13 @@ function renderDayInPlace(){
  if(!oldList)return;
  oldList.innerHTML=a.length?dayTimelineMarkup(a):`<div class="detail-empty">Здесь пока пусто.<br>Добавь дела на этот день.</div>`;
 }
+function closeDay(){
+  const screen=document.getElementById("dayScreen");
+  if(screen) screen.remove();
+  // A day is opened from the month calendar, so Back returns to that calendar.
+  month();
+  if(typeof updateGlobalNav==="function") requestAnimationFrame(updateGlobalNav);
+}
 function openDay(s,keepAdd=false){
  state.date=s;save();closeM();document.getElementById("dayScreen")?.remove();
  const d=dateFrom(s),a=state.plans[s]||[];
@@ -942,7 +1037,7 @@ renderDayInPlace();
 }
 function applyAppearance(){
 const accents={
-  green:{main:'#2f7668',soft:'rgba(47,118,104,.12)',shadow:'rgba(47,118,104,.18)',glow:'rgba(255,216,90,.16)'},
+  green:{main:'#2f7668',soft:'rgba(var(--accent-rgb),.12)',shadow:'rgba(var(--accent-rgb),.18)',glow:'rgba(255,216,90,.16)'},
   pink:{main:'#d985a3',soft:'rgba(217,133,163,.13)',shadow:'rgba(217,133,163,.18)',glow:'rgba(255,190,214,.18)'},
   lavender:{main:'#8b82bd',soft:'rgba(139,130,189,.13)',shadow:'rgba(139,130,189,.18)',glow:'rgba(190,181,255,.18)'},
   sky:{main:'#6d9fbe',soft:'rgba(109,159,190,.13)',shadow:'rgba(109,159,190,.18)',glow:'rgba(167,220,255,.18)'},
@@ -951,6 +1046,15 @@ const accents={
 };
 const ac=accents[state.accent]||accents.green;
 document.documentElement.style.setProperty('--accent',ac.main);
+const accentRgb={
+  green:'47,118,104',
+  pink:'217,133,163',
+  lavender:'139,130,189',
+  sky:'109,159,190',
+  peach:'213,143,115',
+  butter:'196,160,68'
+};
+document.documentElement.style.setProperty('--accent-rgb',accentRgb[state.accent]||accentRgb.green);
 document.documentElement.style.setProperty('--accent-soft',ac.soft);
 document.documentElement.style.setProperty('--accent-shadow',ac.shadow);
 document.documentElement.style.setProperty('--accent-glow',ac.glow);
@@ -1000,144 +1104,53 @@ function exportData(){
 }
 function exportAnalysis(){
   persistData();
-  const today = todayKey;
-  const allDates=Object.keys(state.plans||{})
-    .filter(k=>Array.isArray(state.plans[k]))
-    .sort();
-  const pastDates=allDates.filter(k=>k<today);
-  const todayPlans=Array.isArray(state.plans[today])?state.plans[today]:[];
-  const futureDates=allDates.filter(k=>k>today);
+  const dates=Object.keys(state.plans||{}).filter(k=>Array.isArray(state.plans[k])).sort();
   const libMap=new Map(allTasks().map(t=>[t[0],t]));
-
-  let pastTotal=0,pastDone=0;
-  let todayTotal=todayPlans.length,todayDone=todayPlans.filter(p=>p.done).length;
-  let futureTotal=0;
+  let total=0,done=0;
   const catStats={},taskStats={};
-
-  const getMeta=(p)=>{
-    const lib=libMap.get(p.id);
-    return {
-      cat:(lib&&lib[3])||p.category||'Без раздела',
-      name:p.name||(lib&&lib[1])||'Дело'
-    };
-  };
-
-  pastDates.forEach(ds=>{
-    (state.plans[ds]||[]).forEach(p=>{
-      const {cat,name}=getMeta(p);
-      pastTotal++;
-      if(p.done)pastDone++;
-      catStats[cat]??={planned:0,done:0};
-      catStats[cat].planned++;
-      if(p.done)catStats[cat].done++;
-      taskStats[name]??={planned:0,done:0,category:cat};
-      taskStats[name].planned++;
-      if(p.done)taskStats[name].done++;
-    });
-  });
-
-  futureDates.forEach(ds=>futureTotal+=(state.plans[ds]||[]).length);
-
-  const pastPct=pastTotal?Math.round(pastDone/pastTotal*100):0;
-  const todayPct=todayTotal?Math.round(todayDone/todayTotal*100):0;
+  dates.forEach(ds=>{(state.plans[ds]||[]).forEach(p=>{
+    const lib=libMap.get(p.id); const cat=(lib&&lib[3])||p.category||'Без раздела'; const name=p.name||(lib&&lib[1])||'Дело';
+    total++; if(p.done)done++;
+    catStats[cat]??={planned:0,done:0}; catStats[cat].planned++; if(p.done)catStats[cat].done++;
+    taskStats[name]??={planned:0,done:0,category:cat}; taskStats[name].planned++; if(p.done)taskStats[name].done++;
+  })});
+  const pct=total?Math.round(done/total*100):0;
   const lines=[];
-  const fmtDate=(ds)=>dateFrom(ds).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const fmtTime=(p)=>p.time?(p.time+(p.timeEnd?`–${p.timeEnd}`:'')):'без времени';
-
   lines.push('# Мой ритм — данные для анализа продуктивности');
   lines.push('');
   lines.push(`Экспорт: ${new Date().toLocaleString('ru-RU')}`);
-  lines.push(`Сегодня: ${today}`);
-  lines.push(`Планы в файле: ${allDates[0]||'—'} → ${allDates[allDates.length-1]||'—'}`);
+  lines.push(`Период с планами: ${dates[0]||'—'} → ${dates[dates.length-1]||'—'}`);
   lines.push('');
-
-  lines.push('## ВАЖНО ДЛЯ АНАЛИЗА');
-  lines.push('- Прошедшие дни — даты раньше сегодняшней даты. Только они используются для расчёта исторической продуктивности.');
-  lines.push('- Сегодняшний день показывается отдельно и НЕ считается пропущенным для незавершённых дел.');
-  lines.push('- Будущие планы показываются отдельно и НЕ входят в процент выполнения.');
+  lines.push('## Общая статистика');
+  lines.push(`- Запланировано: ${total}`);
+  lines.push(`- Выполнено: ${done}`);
+  lines.push(`- Выполнение: ${pct}%`);
+  lines.push(`- Дней с планами: ${dates.length}`);
   lines.push('');
-
-  lines.push('## Историческая статистика');
-  lines.push(`- Прошедшие дни с планами: ${pastDates.filter(ds=>(state.plans[ds]||[]).length>0).length}`);
-  lines.push(`- Запланировано в прошедшие дни: ${pastTotal}`);
-  lines.push(`- Выполнено в прошедшие дни: ${pastDone}`);
-  lines.push(`- Выполнение в прошедшие дни: ${pastPct}%`);
+  lines.push('## По категориям');
+  Object.entries(catStats).sort((a,b)=>b[1].planned-a[1].planned).forEach(([cat,v])=>lines.push(`- **${cat}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%)`));
   lines.push('');
-
-  lines.push('## Сегодня');
-  lines.push(`- ${fmtDate(today)}`);
-  lines.push(`- Запланировано сегодня: ${todayTotal}`);
-  lines.push(`- Выполнено сегодня: ${todayDone}`);
-  lines.push(`- Выполнение на момент экспорта: ${todayPct}%`);
-  lines.push(`- Незавершено сегодня: ${Math.max(0,todayTotal-todayDone)} — НЕ считать пропущенным, день ещё идёт.`);
+  lines.push('## По делам');
+  Object.entries(taskStats).sort((a,b)=>b[1].planned-a[1].planned).forEach(([name,v])=>lines.push(`- **${name}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%), категория: ${v.category}`));
   lines.push('');
-
-  lines.push('## Будущие планы');
-  lines.push(`- Дней с будущими планами: ${futureDates.filter(ds=>(state.plans[ds]||[]).length>0).length}`);
-  lines.push(`- Запланировано будущих дел: ${futureTotal}`);
-  lines.push('- Эти дела НЕ входят в статистику продуктивности.');
-  lines.push('');
-
-  lines.push('## По категориям — только прошедшие дни');
-  if(Object.keys(catStats).length){
-    Object.entries(catStats)
-      .sort((a,b)=>b[1].planned-a[1].planned)
-      .forEach(([cat,v])=>lines.push(`- **${cat}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%)`));
-  }else lines.push('- Пока нет завершённых дней с планами для расчёта.');
-  lines.push('');
-
-  lines.push('## По делам — только прошедшие дни');
-  if(Object.keys(taskStats).length){
-    Object.entries(taskStats)
-      .sort((a,b)=>b[1].planned-a[1].planned)
-      .forEach(([name,v])=>lines.push(`- **${name}** — ${v.done}/${v.planned} (${v.planned?Math.round(v.done/v.planned*100):0}%), категория: ${v.category}`));
-  }else lines.push('- Пока нет завершённых дней с планами для расчёта.');
-  lines.push('');
-
   lines.push('## Подробно по дням');
-  allDates.forEach(ds=>{
-    const a=state.plans[ds]||[];
-    const title=fmtDate(ds);
-    const status=ds<today?'ПРОШЕДШИЙ ДЕНЬ':(ds===today?'СЕГОДНЯ':'БУДУЩИЙ ДЕНЬ');
-    lines.push(`### ${title} (${ds}) — ${status}`);
+  dates.forEach(ds=>{
+    const a=state.plans[ds]||[]; const d=dateFrom(ds); const title=d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    lines.push(`### ${title} (${ds})`);
     if(!a.length){lines.push('- Нет дел');lines.push('');return;}
     a.forEach(p=>{
-      const {cat,name}=getMeta(p);
-      const time=fmtTime(p);
-      let mark='[ ]';
-      let stateLabel='не выполнено';
-      if(ds<today){
-        mark=p.done?'[x]':'[ ]';
-        stateLabel=p.done?'выполнено':'не выполнено / пропущено';
-      }else if(ds===today){
-        mark=p.done?'[x]':'[ ]';
-        stateLabel=p.done?'выполнено сегодня':'ещё не выполнено — не считать пропуском';
-      }else{
-        mark='[→]';
-        stateLabel='будущее — не учитывать в продуктивности';
-      }
-      lines.push(`- ${mark} ${name} — ${time} — ${cat} — ${stateLabel}${p.reminder?' — напоминание за 1 час':''}`);
+      const lib=libMap.get(p.id); const cat=(lib&&lib[3])||p.category||'Без раздела'; const time=p.time?(p.time+(p.timeEnd?`–${p.timeEnd}`:'')):'без времени';
+      lines.push(`- [${p.done?'x':' '}] ${p.name||'Дело'} — ${time} — ${cat}${p.reminder?' — напоминание за 1 час':''}`);
     });
     lines.push('');
   });
-
   lines.push('## Библиотека дел');
   allTasks().forEach(t=>lines.push(`- ${t[1]} — ${t[3]||'Без раздела'}`));
   lines.push('');
-
   lines.push('## Как анализировать');
-  lines.push('Анализируй историческую продуктивность только по прошедшим дням. Не смешивай сегодняшние незавершённые дела и будущие планы с пропусками.');
-  lines.push('Отдельно оцени: перегрузку по дням, повторяющиеся пропуски, устойчивые привычки, категории с высокой и низкой фактической выполнимостью, дела без времени и дела со временем.');
-  lines.push('Для будущих планов оценивай только объём и потенциальную нагрузку, но не называй их невыполненными.');
-  lines.push('Предлагай реалистичные изменения без автоматического увеличения количества задач.');
-
+  lines.push('Попроси ChatGPT оценить динамику выполнения, перегрузку по дням и категориям, повторяющиеся пропуски, лучшие и слабые привычки, распределение дел по времени, а также предложить реалистичные изменения без увеличения нагрузки.');
   const blob=new Blob([lines.join('\n')],{type:'text/markdown;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download=`moy-ritm-productivity-${today}.md`;
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`moy-ritm-productivity-${new Date().toISOString().slice(0,10)}.md`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function importData(){
  const input=document.getElementById("importDataInput");if(input)input.click();
@@ -1327,12 +1340,12 @@ h2{font-size:20px;line-height:28px;margin:24px 0 12px;font-weight:720;letter-spa
 
 <style id="ritm-v58-task-icons-delete">
 /* Task identity icons: no emoji, one restrained line icon system. */
-.daytask .taskemoji,.tile .tileemoji{display:grid!important;place-items:center!important;visibility:visible!important;opacity:1!important;color:var(--emerald)!important}
+.daytask .taskemoji,.tile .tileemoji{display:grid!important;place-items:center!important;visibility:visible!important;opacity:1!important;color:var(--accent)!important}
 .task-glyph{width:23px!important;height:23px!important;display:block!important;fill:none!important;stroke:currentColor!important;stroke-width:1.65!important;stroke-linecap:round!important;stroke-linejoin:round!important}
-.daytask .taskemoji{width:34px!important;min-width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:11px!important;background:rgba(61,127,115,.08)!important}
-.tile .tileemoji{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:12px!important;background:rgba(61,127,115,.07)!important}
+.daytask .taskemoji{width:34px!important;min-width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:11px!important;background:rgba(var(--accent-rgb),.08)!important}
+.tile .tileemoji{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:12px!important;background:rgba(var(--accent-rgb),.07)!important}
 .dark .daytask .taskemoji,.dark .tile .tileemoji{background:rgba(117,170,158,.10)!important;color:#79b0a4!important}
-.tile.selected .tileemoji{background:rgba(61,127,115,.12)!important;color:var(--emerald)!important}
+.tile.selected .tileemoji{background:rgba(var(--accent-rgb),.12)!important;color:var(--accent)!important}
 /* Swipe-to-delete: the red/neutral action lives at the right edge and is exposed by the card sliding left. */
 .daytask-wrap{position:relative!important;overflow:hidden!important}
 .daytask-delete{left:auto!important;right:0!important;top:0!important;bottom:0!important;width:76px!important;height:100%!important;min-width:76px!important;padding:0!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#e1dddd!important;color:#ff3b30!important;z-index:1!important;pointer-events:auto!important}
@@ -1371,8 +1384,8 @@ body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thi
 .progress .today-title,.progress .pct,.progress .sub{color:var(--ink)!important}
 .progress .today-title{font-weight:var(--font-weight-title)!important}
 .progress .pct{font-weight:700!important}
-.progress .bar{background:rgba(61,127,115,.12)!important}
-.progress .bar i{background:linear-gradient(90deg,var(--emerald),#69a297)!important;box-shadow:0 0 10px rgba(61,127,115,.14)!important}
+.progress .bar{background:rgba(var(--accent-rgb),.12)!important}
+.progress .bar i{background:linear-gradient(90deg,var(--accent),#69a297)!important;box-shadow:0 0 10px rgba(var(--accent-rgb),.14)!important}
 /* remove emoji everywhere; replace with quiet geometry */
 .tileemoji,.taskemoji{display:none!important}
 .tile{gap:0!important}
@@ -1380,8 +1393,8 @@ body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thi
 .daytask .name{font-weight:var(--font-weight-title)!important}
 .tile .name{font-weight:var(--font-weight-title)!important}
 /* timeline: no emoji, clean nodes */
-.timeline-node{font-size:0!important;background:rgba(255,255,255,.78)!important;border:2px solid var(--bg)!important;box-shadow:0 0 0 1px rgba(61,127,115,.28),0 4px 12px rgba(45,41,42,.05)!important}
-.timeline-node:after{content:"";width:7px;height:7px;border-radius:50%;background:var(--emerald);opacity:.72}
+.timeline-node{font-size:0!important;background:rgba(255,255,255,.78)!important;border:2px solid var(--bg)!important;box-shadow:0 0 0 1px rgba(var(--accent-rgb),.28),0 4px 12px rgba(45,41,42,.05)!important}
+.timeline-node:after{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.72}
 .timeline-item.done .timeline-node:after{background:var(--yellow);opacity:1;box-shadow:0 0 9px rgba(255,215,90,.45)}
 .timeline-card{background:var(--glass)!important;box-shadow:var(--glass-shadow)!important;border:1px solid var(--glass-line)!important}
 .timeline-task-name{font-weight:var(--font-weight-title)!important}
@@ -1391,7 +1404,7 @@ body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thi
 .back:before,.sheet-back:before,.stats-back:before{content:""!important;width:12px!important;height:12px!important;border-left:2px solid currentColor!important;border-bottom:2px solid currentColor!important;transform:rotate(45deg)!important;display:block!important}
 /* settings icon: one proper iOS-like gear, no inner decorative circle */
 .iconbtn{font-size:0!important;position:relative!important}
-.iconbtn:before{content:"⚙";font-family:Arial,sans-serif;font-size:27px;line-height:1;color:var(--emerald);font-weight:400}
+.iconbtn:before{content:"⚙";font-family:Arial,sans-serif;font-size:27px;line-height:1;color:var(--accent);font-weight:400}
 .iconbtn svg{display:none!important}
 /* sheets stay inside viewport */
 .time-sheet{box-sizing:border-box!important;width:min(100%,540px)!important;max-width:540px!important;margin:0 auto!important;padding:22px 20px calc(20px + env(safe-area-inset-bottom))!important;border-radius:28px 28px 0 0!important;background:rgba(247,245,241,.96)!important;border:1px solid rgba(255,255,255,.95)!important;box-shadow:0 -16px 42px rgba(45,41,42,.10),inset 0 1px 0 rgba(255,255,255,.98)!important}
@@ -1402,12 +1415,12 @@ body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thi
 .time-range-field{min-width:0}
 .time-range-field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px 3px}
 .time-range-field input{box-sizing:border-box;width:100%;height:56px;border:1px solid rgba(222,217,219,.95);border-radius:17px;background:rgba(255,255,255,.82);padding:0 12px;text-align:center;font-size:24px;font-weight:650;color:var(--ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.95)}
-.time-range-field input:focus{outline:none;border-color:rgba(61,127,115,.35);box-shadow:0 0 0 3px rgba(61,127,115,.08),inset 0 1px 0 #fff}
+.time-range-field input:focus{outline:none;border-color:rgba(var(--accent-rgb),.35);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.08),inset 0 1px 0 #fff}
 .time-range-note{margin-top:12px;padding:11px 13px;border-radius:15px;background:rgba(217,154,178,.11);color:var(--pink);font-size:13px;font-weight:600}
 .time-actions{margin-top:16px!important}
 .time-actions button{height:50px!important;border-radius:16px!important}
 .time-cancel{background:rgba(255,255,255,.72)!important;color:var(--muted)!important}
-.time-save{background:var(--emerald)!important;color:#fff!important;box-shadow:0 8px 18px rgba(61,127,115,.16)!important}
+.time-save{background:var(--accent)!important;color:#fff!important;box-shadow:0 8px 18px rgba(var(--accent-rgb),.16)!important}
 /* settings — rebuild as a real settings surface */
 .sheet.settings-sheet{background:rgba(244,242,238,.92)!important}
 .settings-sheet .settings-title{font-size:11px!important;line-height:16px!important;letter-spacing:.11em!important;font-weight:650!important;color:#969194!important;margin:0 0 9px!important}
@@ -1416,7 +1429,7 @@ body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thi
 .settings-sheet .opt.selected{background:rgba(232,233,232,.9)!important;color:var(--accent)!important;box-shadow:inset 0 2px 5px rgba(45,41,42,.06),inset 0 1px 0 #fff!important}
 .font-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
 .font-choice button{height:58px;border-radius:17px;border:1px solid var(--glass-line);background:rgba(255,255,255,.68);box-shadow:var(--glass-shadow);color:var(--ink)}
-.font-choice button.selected{background:rgba(232,233,232,.9);color:var(--emerald);box-shadow:inset 0 2px 5px rgba(45,41,42,.06),inset 0 1px 0 #fff}
+.font-choice button.selected{background:rgba(232,233,232,.9);color:var(--accent);box-shadow:inset 0 2px 5px rgba(45,41,42,.06),inset 0 1px 0 #fff}
 .font-choice .thin-label{font-weight:390;font-size:17px}.font-choice .standard-label{font-weight:650;font-size:17px}
 .settings-sheet .bgthumb{height:62px!important;border-radius:13px!important;margin-bottom:8px!important}
 /* consistent icon stroke */
@@ -1528,7 +1541,7 @@ body.font-thin .top h1,body.font-thin h2,body.font-thin .day-title,body.font-thi
 <style id="ritm-v56-final-polish">
 /* Real gear: use the existing outer gear path only, without the inner circle. */
 .iconbtn:before{content:none!important}
-.iconbtn svg{display:block!important;width:25px!important;height:25px!important;stroke:var(--emerald)!important;fill:none!important}
+.iconbtn svg{display:block!important;width:25px!important;height:25px!important;stroke:var(--accent)!important;fill:none!important}
 .iconbtn svg path:first-child{display:none!important}
 .iconbtn svg path:last-child{display:block!important}
 .iconbtn svg path:last-child{stroke-width:1.65!important}
@@ -1562,7 +1575,7 @@ h2,.day-summary{font-weight:var(--font-weight-title)!important;letter-spacing:-.
 .sheet .close:before{content:""!important;position:absolute!important;width:18px!important;height:2px!important;background:currentColor!important;border-radius:99px!important;transform:rotate(45deg)!important}.sheet .close:after{content:""!important;position:absolute!important;width:18px!important;height:2px!important;background:currentColor!important;border-radius:99px!important;transform:rotate(-45deg)!important}.sheet .close{position:relative!important;color:var(--ink)!important;background:rgba(255,255,255,.58)!important;font-size:0!important}
 
 .settings-sheet .background-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.settings-sheet .background-grid .opt{min-height:112px!important;padding:8px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-end!important;overflow:hidden!important}.settings-sheet .background-grid .bgthumb{height:70px!important;flex:0 0 70px!important;margin:0 0 7px!important;border-radius:14px!important}.settings-sheet .background-grid .opt{font-size:12px!important;text-align:left!important}.settings-sheet .color-panel{margin-top:8px!important;padding:12px!important;border-radius:18px!important;background:rgba(255,255,255,.48)!important;border:1px solid rgba(255,255,255,.86)!important}.settings-sheet .settings-actions{grid-template-columns:1fr 1fr!important;gap:8px!important}.settings-sheet .settings-action{border:1px solid var(--glass-line)!important;border-radius:16px!important;background:rgba(255,255,255,.68)!important;box-shadow:var(--glass-shadow)!important;min-height:58px!important;padding:11px 12px!important;font-size:13px!important;font-weight:620!important}.settings-sheet .settings-action small{font-size:10px!important;line-height:13px!important;margin-top:3px!important}.settings-sheet .settings-danger{color:#c34b48!important}
-.settings-sheet .category-row input{background:rgba(255,255,255,.68)!important;border:1px solid var(--glass-line)!important;box-shadow:var(--glass-shadow)!important}.settings-sheet .category-row button{background:var(--emerald)!important;box-shadow:0 7px 16px rgba(61,127,115,.14)!important}
+.settings-sheet .category-row input{background:rgba(255,255,255,.68)!important;border:1px solid var(--glass-line)!important;box-shadow:var(--glass-shadow)!important}.settings-sheet .category-row button{background:var(--accent)!important;box-shadow:0 7px 16px rgba(var(--accent-rgb),.14)!important}
 /* no emoji in data/settings actions */
 .settings-sheet .settings-action{font-size:0!important}.settings-sheet .settings-action::first-line{font-size:13px!important}
 </style>
@@ -1634,26 +1647,6 @@ h2,.day-summary{font-weight:var(--font-weight-title)!important;letter-spacing:-.
   document.body.classList.toggle('font-standard',initial!=='thin');
 })();
 </script>
-
-<style id="ritm-v59-emoji-restore">
-/* v59 — вернуть пользовательские emoji как основной визуальный идентификатор дел */
-.daytask .taskemoji,.tile .tileemoji{
-  display:grid!important;
-  place-items:center!important;
-  visibility:visible!important;
-  opacity:1!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  color:inherit!important;
-  border-radius:0!important;
-  font-family:inherit!important;
-}
-.daytask .taskemoji{width:36px!important;min-width:36px!important;height:36px!important;flex:0 0 36px!important;font-size:28px!important;line-height:1!important}
-.tile .tileemoji{width:38px!important;min-width:38px!important;height:38px!important;flex:0 0 38px!important;font-size:29px!important;line-height:1!important}
-.daytask .left{gap:12px!important}
-.tile{gap:12px!important}
-</style>
 </html>
 <style>.modal .nav{z-index:310}.month-sheet .nav{z-index:310}.settings-nav{z-index:310}</style>
 
@@ -1723,28 +1716,28 @@ button,input{font-family:inherit}
 .app:after,.day-screen:after,.period-screen:after{content:"";position:fixed;pointer-events:none;z-index:-1;width:280px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(223,155,180,.08),transparent 68%);bottom:18%;left:-130px;filter:blur(16px)}
 .app{max-width:540px;padding:calc(22px + env(safe-area-inset-top)) 20px calc(112px + env(safe-area-inset-bottom))!important}
 .top{height:44px!important;margin:0 0 18px!important;align-items:center!important}.top h1{font-size:28px!important;line-height:32px!important;font-weight:760!important;letter-spacing:-.035em!important}
-.iconbtn{width:44px!important;height:44px!important;border-radius:16px!important;color:var(--emerald)!important;background:rgba(255,255,255,.38)!important;box-shadow:var(--shadow-soft)!important}
+.iconbtn{width:44px!important;height:44px!important;border-radius:16px!important;color:var(--accent)!important;background:rgba(255,255,255,.38)!important;box-shadow:var(--shadow-soft)!important}
 .iconbtn svg{width:22px!important;height:22px!important;stroke-width:1.8!important}
-.calendar{margin:0 0 22px!important}.calendar-date .dow{font-size:13px!important;line-height:18px!important}.calendar-date .num{font-size:25px!important;line-height:28px!important;font-weight:680!important}.center-pill{height:82px!important;border-radius:28px!important;background:rgba(60,127,114,.96)!important;box-shadow:0 10px 24px rgba(60,127,114,.18),inset 0 1px 0 rgba(255,255,255,.2)!important}
+.calendar{margin:0 0 22px!important}.calendar-date .dow{font-size:13px!important;line-height:18px!important}.calendar-date .num{font-size:25px!important;line-height:28px!important;font-weight:680!important}.center-pill{height:82px!important;border-radius:28px!important;background:rgba(var(--accent-rgb),.96)!important;box-shadow:0 10px 24px rgba(var(--accent-rgb),.18),inset 0 1px 0 rgba(255,255,255,.2)!important}
 .progress{height:174px!important;border-radius:var(--r-xl)!important;padding:21px 22px!important;margin-bottom:26px!important;overflow:hidden;position:relative;background:linear-gradient(135deg,rgba(255,255,255,.62),rgba(255,255,255,.42))!important}
 .progress:after{content:"";position:absolute;right:-42px;top:-70px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,216,90,.28),transparent 67%);filter:blur(10px);pointer-events:none}
-.progress .today-title{font-size:18px!important;line-height:24px!important;font-weight:650!important;position:relative;z-index:1}.progress .pct{font-size:46px!important;line-height:50px!important;font-weight:760!important;letter-spacing:-.05em!important;position:relative;z-index:1}.progress .sub{font-size:15px!important;line-height:20px!important;position:relative;z-index:1}.progress .bar{height:7px!important;margin-top:17px!important;background:rgba(255,255,255,.42)!important;border-radius:99px!important;overflow:hidden}.progress .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--emerald),#72a69c)!important;box-shadow:0 0 12px rgba(60,127,114,.24)}
+.progress .today-title{font-size:18px!important;line-height:24px!important;font-weight:650!important;position:relative;z-index:1}.progress .pct{font-size:46px!important;line-height:50px!important;font-weight:760!important;letter-spacing:-.05em!important;position:relative;z-index:1}.progress .sub{font-size:15px!important;line-height:20px!important;position:relative;z-index:1}.progress .bar{height:7px!important;margin-top:17px!important;background:rgba(255,255,255,.42)!important;border-radius:99px!important;overflow:hidden}.progress .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#72a69c)!important;box-shadow:0 0 12px rgba(var(--accent-rgb),.24)}
 h2{font-size:20px!important;line-height:26px!important;margin:26px 0 12px!important;font-weight:720!important;letter-spacing:-.025em!important}
 .day-summary{width:100%!important;min-height:44px!important;padding:0 2px!important;margin:0 0 12px!important;background:transparent!important;border:0!important;box-shadow:none!important;font-size:20px!important;line-height:26px!important;font-weight:720!important}.day-summary .count{font-size:15px!important;color:var(--muted)!important;font-weight:600!important;margin-left:7px}.day-summary .chev{font-size:0!important;width:44px!important;height:44px!important;display:grid!important;place-items:center!important;color:transparent!important}.day-summary .chev:before{content:""!important;width:10px!important;height:10px!important;border-right:2px solid #777274!important;border-bottom:2px solid #777274!important;transform:rotate(45deg) translateY(-2px)!important;display:block!important}.day-summary.open .chev:before{transform:rotate(225deg) translateY(-2px)!important}
-.added{gap:8px!important;margin-bottom:22px!important}.daytask-wrap{position:relative;border-radius:18px!important;overflow:hidden;background:rgba(225,222,222,.55)!important}.daytask{min-height:64px!important;height:64px!important;border-radius:18px!important;padding:10px 14px 10px 15px!important;background:rgba(255,255,255,.70)!important;box-shadow:var(--shadow-soft)!important}.daytask .left{gap:12px!important;min-width:0}.daytask .taskemoji{width:34px!important;min-width:34px!important;height:34px!important;display:grid;place-items:center;font-size:25px!important}.daytask .name{font-size:16px!important;line-height:21px!important;font-weight:620!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daytask .time-row{gap:9px!important}.daytask .time-btn{font-size:12px!important}.daytask .check{width:22px!important;height:22px!important;border-radius:50%!important;border:1.7px solid #b8b4b6!important;display:grid!important;place-items:center!important;font-size:0!important;position:relative!important;background:rgba(255,255,255,.35)!important}.daytask.done .check{background:var(--emerald)!important;border-color:var(--emerald)!important}.daytask.done .check:after{content:""!important;width:8px!important;height:4px!important;border-left:2px solid white!important;border-bottom:2px solid white!important;transform:rotate(-45deg) translate(1px,-1px)!important}.daytask.done .name{text-decoration:line-through;color:#8c888a!important}.daytask-delete{width:74px!important;background:#dedbdc!important;color:#ff3b30!important;border:0!important}.daytask-delete svg{width:20px!important;height:20px!important;stroke:currentColor!important;stroke-width:1.8!important}
-.tile{height:64px!important;min-height:64px!important;max-height:64px!important;border-radius:18px!important;padding:9px 14px!important;gap:12px!important;background:rgba(255,255,255,.72)!important;box-shadow:var(--shadow-soft)!important}.tileemoji{width:36px!important;height:36px!important;flex-basis:36px!important;font-size:27px!important;display:grid!important;place-items:center!important}.tile .name{font-size:16px!important;line-height:21px!important;font-weight:620!important}.tile.selected{background:rgba(232,233,232,.86)!important;border-color:rgba(255,255,255,.72)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 8px 18px rgba(53,48,43,.045)!important}.tile.selected .name{color:var(--emerald)!important}.tile .plus{width:34px!important;height:34px!important;margin-left:auto!important;display:grid!important;place-items:center!important;font-size:0!important;color:var(--emerald)!important;background:rgba(255,255,255,.36)!important;border-radius:12px!important}.tile .plus:after{content:""!important;width:11px!important;height:6px!important;border-left:2.2px solid currentColor!important;border-bottom:2.2px solid currentColor!important;transform:rotate(-45deg) translate(1px,-1px)!important;display:block!important}.tasklib{gap:9px!important}.task-category{margin:25px 0 8px!important}.task-category-title{font-size:12px!important;line-height:18px!important;letter-spacing:.08em!important;font-weight:700!important;color:#969194!important;text-transform:uppercase!important;margin:0 2px 9px!important}.task-category-title .dot{width:6px!important;height:6px!important;background:var(--emerald)!important;box-shadow:0 0 8px rgba(60,127,114,.18)!important}.custom-task-create{height:52px!important;border-radius:16px!important;background:rgba(255,255,255,.34)!important;color:var(--emerald)!important;box-shadow:var(--shadow-soft)!important}
+.added{gap:8px!important;margin-bottom:22px!important}.daytask-wrap{position:relative;border-radius:18px!important;overflow:hidden;background:rgba(225,222,222,.55)!important}.daytask{min-height:64px!important;height:64px!important;border-radius:18px!important;padding:10px 14px 10px 15px!important;background:rgba(255,255,255,.70)!important;box-shadow:var(--shadow-soft)!important}.daytask .left{gap:12px!important;min-width:0}.daytask .taskemoji{width:34px!important;min-width:34px!important;height:34px!important;display:grid;place-items:center;font-size:25px!important}.daytask .name{font-size:16px!important;line-height:21px!important;font-weight:620!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.daytask .time-row{gap:9px!important}.daytask .time-btn{font-size:12px!important}.daytask .check{width:22px!important;height:22px!important;border-radius:50%!important;border:1.7px solid #b8b4b6!important;display:grid!important;place-items:center!important;font-size:0!important;position:relative!important;background:rgba(255,255,255,.35)!important}.daytask.done .check{background:var(--accent)!important;border-color:var(--accent)!important}.daytask.done .check:after{content:""!important;width:8px!important;height:4px!important;border-left:2px solid white!important;border-bottom:2px solid white!important;transform:rotate(-45deg) translate(1px,-1px)!important}.daytask.done .name{text-decoration:line-through;color:#8c888a!important}.daytask-delete{width:74px!important;background:#dedbdc!important;color:#ff3b30!important;border:0!important}.daytask-delete svg{width:20px!important;height:20px!important;stroke:currentColor!important;stroke-width:1.8!important}
+.tile{height:64px!important;min-height:64px!important;max-height:64px!important;border-radius:18px!important;padding:9px 14px!important;gap:12px!important;background:rgba(255,255,255,.72)!important;box-shadow:var(--shadow-soft)!important}.tileemoji{width:36px!important;height:36px!important;flex-basis:36px!important;font-size:27px!important;display:grid!important;place-items:center!important}.tile .name{font-size:16px!important;line-height:21px!important;font-weight:620!important}.tile.selected{background:rgba(232,233,232,.86)!important;border-color:rgba(255,255,255,.72)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 8px 18px rgba(53,48,43,.045)!important}.tile.selected .name{color:var(--accent)!important}.tile .plus{width:34px!important;height:34px!important;margin-left:auto!important;display:grid!important;place-items:center!important;font-size:0!important;color:var(--accent)!important;background:rgba(255,255,255,.36)!important;border-radius:12px!important}.tile .plus:after{content:""!important;width:11px!important;height:6px!important;border-left:2.2px solid currentColor!important;border-bottom:2.2px solid currentColor!important;transform:rotate(-45deg) translate(1px,-1px)!important;display:block!important}.tasklib{gap:9px!important}.task-category{margin:25px 0 8px!important}.task-category-title{font-size:12px!important;line-height:18px!important;letter-spacing:.08em!important;font-weight:700!important;color:#969194!important;text-transform:uppercase!important;margin:0 2px 9px!important}.task-category-title .dot{width:6px!important;height:6px!important;background:var(--accent)!important;box-shadow:0 0 8px rgba(var(--accent-rgb),.18)!important}.custom-task-create{height:52px!important;border-radius:16px!important;background:rgba(255,255,255,.34)!important;color:var(--accent)!important;box-shadow:var(--shadow-soft)!important}
 /* single-source icon geometry */
 .day-summary .chev span,.day-summary .chev svg,.day-summary .chev .arrow{display:none!important}.tile .plus svg,.tile .plus span{display:none!important}.tile .plus:before{display:none!important}
 /* global navigation */
 #globalNav{height:calc(82px + env(safe-area-inset-bottom))!important;background:rgba(248,247,244,.72)!important;border-top:1px solid rgba(255,255,255,.9)!important;box-shadow:0 -12px 30px rgba(53,48,43,.06)!important;backdrop-filter:blur(28px) saturate(125%)!important;-webkit-backdrop-filter:blur(28px) saturate(125%)!important}
-#globalNav .global-nav-inner{height:82px!important;padding:0 8px!important;max-width:540px!important}#globalNav button{height:82px!important;padding:9px 4px 7px!important;gap:4px!important;color:#979396!important;font-size:11px!important;line-height:15px!important;font-weight:560!important}#globalNav button .nav-icon,#globalNav button .nav-icon svg{width:22px!important;height:22px!important}#globalNav button .nav-icon svg{stroke-width:1.75!important}#globalNav button.sel{color:var(--emerald)!important;font-weight:700!important}#globalNav button.sel .nav-icon{filter:drop-shadow(0 0 5px rgba(255,216,90,.22))}
+#globalNav .global-nav-inner{height:82px!important;padding:0 8px!important;max-width:540px!important}#globalNav button{height:82px!important;padding:9px 4px 7px!important;gap:4px!important;color:#979396!important;font-size:11px!important;line-height:15px!important;font-weight:560!important}#globalNav button .nav-icon,#globalNav button .nav-icon svg{width:22px!important;height:22px!important}#globalNav button .nav-icon svg{stroke-width:1.75!important}#globalNav button.sel{color:var(--accent)!important;font-weight:700!important}#globalNav button.sel .nav-icon{filter:drop-shadow(0 0 5px rgba(255,216,90,.22))}
 /* sheets / month / settings */
 .modal{background:rgba(36,34,36,.16)!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important}.sheet{border-radius:30px 30px 0 0!important;background:rgba(248,247,244,.84)!important;padding:22px 20px calc(100px + env(safe-area-inset-bottom))!important;box-shadow:0 -10px 40px rgba(53,48,43,.10),inset 0 1px 0 rgba(255,255,255,.9)!important}.sheet-handle{width:42px!important;height:5px!important;border-radius:99px!important;background:rgba(100,95,98,.20)!important;margin:0 auto 18px!important}.sheet h3{font-size:24px!important;line-height:30px!important;font-weight:740!important;letter-spacing:-.035em!important}.sheet .close,.sheet-back,.back,.stats-back{width:44px!important;height:44px!important;min-width:44px!important;border:1px solid rgba(255,255,255,.82)!important;border-radius:15px!important;background:rgba(255,255,255,.55)!important;box-shadow:var(--shadow-soft)!important;color:var(--ink)!important;display:grid!important;place-items:center!important;font-size:0!important}.sheet .close:before{content:"";width:12px;height:12px;background:linear-gradient(45deg,transparent 46%,#777274 47%,#777274 53%,transparent 54%),linear-gradient(-45deg,transparent 46%,#777274 47%,#777274 53%,transparent 54%)}
-.sheet .opt{border:1px solid rgba(255,255,255,.82)!important;border-radius:18px!important;background:rgba(255,255,255,.55)!important;box-shadow:var(--shadow-soft)!important;min-height:50px!important}.sheet .opt.selected{background:rgba(232,233,232,.82)!important;box-shadow:var(--shadow-pressed)!important;color:var(--emerald)!important}.sheet p,.settings-title{font-size:12px!important;line-height:18px!important;font-weight:700!important;color:#8f8b8d!important;letter-spacing:.07em!important;text-transform:uppercase!important}.month-head{font-size:12px!important;color:#999597!important}.mday{border:0!important;border-radius:16px!important;background:rgba(255,255,255,.38)!important;box-shadow:none!important;font-size:16px!important}.mday.current{background:var(--emerald)!important;color:#fff!important;box-shadow:0 8px 18px rgba(60,127,114,.18)!important}.mday.today:not(.current){box-shadow:inset 0 0 0 1.5px var(--yellow)!important}.count{font-size:9px!important;color:inherit!important;opacity:.72}
+.sheet .opt{border:1px solid rgba(255,255,255,.82)!important;border-radius:18px!important;background:rgba(255,255,255,.55)!important;box-shadow:var(--shadow-soft)!important;min-height:50px!important}.sheet .opt.selected{background:rgba(232,233,232,.82)!important;box-shadow:var(--shadow-pressed)!important;color:var(--accent)!important}.sheet p,.settings-title{font-size:12px!important;line-height:18px!important;font-weight:700!important;color:#8f8b8d!important;letter-spacing:.07em!important;text-transform:uppercase!important}.month-head{font-size:12px!important;color:#999597!important}.mday{border:0!important;border-radius:16px!important;background:rgba(255,255,255,.38)!important;box-shadow:none!important;font-size:16px!important}.mday.current{background:var(--accent)!important;color:#fff!important;box-shadow:0 8px 18px rgba(var(--accent-rgb),.18)!important}.mday.today:not(.current){box-shadow:inset 0 0 0 1.5px var(--yellow)!important}.count{font-size:9px!important;color:inherit!important;opacity:.72}
 /* period / stats */
 .period-screen{background:var(--bg)!important;padding:calc(22px + env(safe-area-inset-top)) 20px calc(112px + env(safe-area-inset-bottom))!important}.period-head{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:0!important;margin-bottom:22px!important}.period-title{font-size:30px!important;line-height:34px!important;font-weight:760!important;letter-spacing:-.04em!important}.period-sub{font-size:13px!important;color:var(--muted)!important}.period-fields{gap:10px!important}.period-field{border-radius:18px!important;padding:10px 13px!important}.period-field input{font-size:15px!important;border:0!important;background:transparent!important}.period-section{margin-top:24px!important}.period-section>h3{font-size:19px!important;line-height:25px!important;font-weight:720!important}.period-summary,.period-chart,.period-task-row,.period-good,.period-advice,.period-category{border-radius:22px!important}.period-big{font-size:48px!important;line-height:52px!important;font-weight:760!important;letter-spacing:-.05em!important}.period-chart-bars{border:0!important}.stats-hero{border-radius:24px!important}
 /* day timeline */
-.day-screen{background:var(--bg)!important;padding:calc(22px + env(safe-area-inset-top)) 20px calc(112px + env(safe-area-inset-bottom))!important}.day-head{margin:0 0 26px!important;padding:0 2px!important;align-items:flex-start!important}.day-head .back{background:rgba(255,255,255,.52)!important}.back-chevron{width:12px!important;height:12px!important;border-left:2px solid var(--ink)!important;border-bottom:2px solid var(--ink)!important}.day-kicker{font-size:13px!important;line-height:18px!important;color:var(--muted)!important;font-weight:600!important}.day-title{font-size:30px!important;line-height:34px!important;font-weight:760!important;letter-spacing:-.04em!important}.day-subtitle{font-size:13px!important;line-height:18px!important;color:var(--muted)!important}.timeline-list{gap:10px!important;padding:2px 0 6px!important}.timeline-list:before{left:66px!important;top:24px!important;bottom:24px!important;width:1.5px!important;background:linear-gradient(to bottom,rgba(60,127,114,.14),rgba(60,127,114,.42),rgba(60,127,114,.10))!important}.timeline-item{grid-template-columns:50px 34px minmax(0,1fr)!important;column-gap:10px!important;min-height:74px!important}.timeline-time{font-size:11px!important;line-height:16px!important;color:#979295!important;padding-top:11px!important}.timeline-node{width:28px!important;height:28px!important;background:rgba(255,255,255,.62)!important;border:3px solid var(--bg)!important;box-shadow:0 0 0 1px rgba(60,127,114,.28),0 4px 10px rgba(53,48,43,.06)!important}.timeline-item.done .timeline-node{background:var(--emerald)!important;box-shadow:0 0 0 1px rgba(60,127,114,.12),0 0 14px rgba(255,216,90,.25)!important;opacity:1!important}.timeline-card{min-height:70px!important;border-radius:20px!important;padding:12px 13px!important;background:rgba(255,255,255,.62)!important}.timeline-task-name{font-size:15px!important;line-height:20px!important;font-weight:660!important}.timeline-card-meta{font-size:11px!important;line-height:16px!important}.timeline-check{width:20px!important;height:20px!important;border:1.7px solid #bbb7b9!important;background:rgba(255,255,255,.35)!important}.timeline-item.done .timeline-check{background:var(--emerald)!important;border-color:var(--emerald)!important;box-shadow:0 0 10px rgba(255,216,90,.20)!important}.detail-add{height:52px!important;margin-top:18px!important;border-radius:17px!important;background:rgba(255,255,255,.58)!important;color:var(--emerald)!important;font-size:15px!important;font-weight:680!important}
+.day-screen{background:var(--bg)!important;padding:calc(22px + env(safe-area-inset-top)) 20px calc(112px + env(safe-area-inset-bottom))!important}.day-head{margin:0 0 26px!important;padding:0 2px!important;align-items:flex-start!important}.day-head .back{background:rgba(255,255,255,.52)!important}.back-chevron{width:12px!important;height:12px!important;border-left:2px solid var(--ink)!important;border-bottom:2px solid var(--ink)!important}.day-kicker{font-size:13px!important;line-height:18px!important;color:var(--muted)!important;font-weight:600!important}.day-title{font-size:30px!important;line-height:34px!important;font-weight:760!important;letter-spacing:-.04em!important}.day-subtitle{font-size:13px!important;line-height:18px!important;color:var(--muted)!important}.timeline-list{gap:10px!important;padding:2px 0 6px!important}.timeline-list:before{left:66px!important;top:24px!important;bottom:24px!important;width:1.5px!important;background:linear-gradient(to bottom,rgba(var(--accent-rgb),.14),rgba(var(--accent-rgb),.42),rgba(var(--accent-rgb),.10))!important}.timeline-item{grid-template-columns:50px 34px minmax(0,1fr)!important;column-gap:10px!important;min-height:74px!important}.timeline-time{font-size:11px!important;line-height:16px!important;color:#979295!important;padding-top:11px!important}.timeline-node{width:28px!important;height:28px!important;background:rgba(255,255,255,.62)!important;border:3px solid var(--bg)!important;box-shadow:0 0 0 1px rgba(var(--accent-rgb),.28),0 4px 10px rgba(53,48,43,.06)!important}.timeline-item.done .timeline-node{background:var(--accent)!important;box-shadow:0 0 0 1px rgba(var(--accent-rgb),.12),0 0 14px rgba(255,216,90,.25)!important;opacity:1!important}.timeline-card{min-height:70px!important;border-radius:20px!important;padding:12px 13px!important;background:rgba(255,255,255,.62)!important}.timeline-task-name{font-size:15px!important;line-height:20px!important;font-weight:660!important}.timeline-card-meta{font-size:11px!important;line-height:16px!important}.timeline-check{width:20px!important;height:20px!important;border:1.7px solid #bbb7b9!important;background:rgba(255,255,255,.35)!important}.timeline-item.done .timeline-check{background:var(--accent)!important;border-color:var(--accent)!important;box-shadow:0 0 10px rgba(255,216,90,.20)!important}.detail-add{height:52px!important;margin-top:18px!important;border-radius:17px!important;background:rgba(255,255,255,.58)!important;color:var(--accent)!important;font-size:15px!important;font-weight:680!important}
 /* remove legacy duplicate navigation inside screens */
 .nav:not(#globalNav),.period-nav,.settings-nav,.month-nav{display:none!important}
 .dark{--bg:#202022;--glass:rgba(48,47,50,.72);--glass-strong:rgba(54,53,56,.82);--glass-soft:rgba(54,53,56,.55);--glass-line:rgba(255,255,255,.10);--ink:#f3f2f3;--muted:#aaa7aa}.dark .app,.dark .day-screen,.dark .period-screen{background:var(--bg)!important}.dark #globalNav{background:rgba(32,32,34,.78)!important;border-top-color:rgba(255,255,255,.08)!important}.dark .progress,.dark .daytask,.dark .tile,.dark .timeline-card,.dark .sheet{background:var(--glass)!important}
@@ -1782,13 +1775,13 @@ h2{font-size:20px!important;line-height:26px!important;margin:26px 0 12px!import
   visibility:visible!important;
   opacity:1!important;
   place-items:center!important;
-  color:var(--emerald)!important;
+  color:var(--accent)!important;
 }
-.daytask .taskemoji{width:34px!important;min-width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:11px!important;background:rgba(61,127,115,.08)!important}
-.tile .tileemoji{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:12px!important;background:rgba(61,127,115,.07)!important}
+.daytask .taskemoji{width:34px!important;min-width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:11px!important;background:rgba(var(--accent-rgb),.08)!important}
+.tile .tileemoji{width:36px!important;height:36px!important;flex:0 0 36px!important;border-radius:12px!important;background:rgba(var(--accent-rgb),.07)!important}
 .task-glyph{width:23px!important;height:23px!important;display:block!important;fill:none!important;stroke:currentColor!important;stroke-width:1.65!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 .dark .daytask .taskemoji,.dark .tile .tileemoji{background:rgba(117,170,158,.10)!important;color:#79b0a4!important}
-.tile.selected .tileemoji{background:rgba(61,127,115,.12)!important;color:var(--emerald)!important}
+.tile.selected .tileemoji{background:rgba(var(--accent-rgb),.12)!important;color:var(--accent)!important}
 .daytask-wrap{position:relative!important;overflow:hidden!important}
 .daytask-delete{left:auto!important;right:0!important;top:0!important;bottom:0!important;width:76px!important;height:100%!important;min-width:76px!important;padding:0!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important;background:#dedbdc!important;color:#ff3b30!important;z-index:1!important;pointer-events:auto!important}
 .daytask-delete svg{width:21px!important;height:21px!important;display:block!important;stroke:currentColor!important;fill:none!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
@@ -1797,44 +1790,140 @@ h2{font-size:20px!important;line-height:26px!important;margin:26px 0 12px!import
 .library-task-delete svg{width:21px!important;height:21px!important}
 </style>
 
-<style id="ritm-v60-accent-system">
-/* v60 — selected accent drives every accent-colored component */
-:root{--emerald:var(--accent);}
-.progress .bar i{background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 68%,white))!important;box-shadow:0 0 10px var(--accent-shadow)!important}
-.daytask.done .check{background:var(--accent)!important;border-color:var(--accent)!important}
-.tile.selected .tileemoji{background:var(--accent-soft)!important;color:var(--accent)!important}
-.tile.selected .name{color:var(--accent)!important}
-.tile .plus{color:var(--accent)!important}
-.task-category-title .dot{background:var(--accent)!important;box-shadow:0 0 8px var(--accent-shadow)!important}
-.custom-task-create{color:var(--accent)!important}
-#globalNav button.sel{color:var(--accent)!important}
-.sheet .opt.selected{color:var(--accent)!important}
-.mday.current{background:var(--accent)!important;box-shadow:0 8px 18px var(--accent-shadow)!important}
-.timeline-list:before{background:linear-gradient(to bottom,color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--accent) 42%,transparent),color-mix(in srgb,var(--accent) 10%,transparent))!important}
-.timeline-node:after{background:var(--accent)!important}
-.timeline-item.done .timeline-node{background:var(--accent)!important;box-shadow:0 0 0 1px var(--accent-soft),0 0 14px var(--accent-glow)!important}
-.timeline-item.done .timeline-check{background:var(--accent)!important;border-color:var(--accent)!important;box-shadow:0 0 10px var(--accent-glow)!important}
-.detail-add{color:var(--accent)!important}
-.time-save{background:var(--accent)!important}
-.reminder-note,.time-range-note{color:var(--accent)!important;background:var(--accent-soft)!important}
-.settings-sheet .category-row button{background:var(--accent)!important;box-shadow:0 7px 16px var(--accent-shadow)!important}
-.settings-sheet .accent-choice.selected{color:var(--accent)!important}
-.settings-sheet .font-pair button.selected{color:var(--accent)!important}
-.settings-sheet .segmented button.selected{color:var(--accent)!important}
+<style id="ritm-v59-time-and-accent">
+/* v59 — time editor must sit above the fixed tab bar */
+#timeModal{
+  z-index:100500!important;
+  align-items:flex-end!important;
+  padding:0!important;
+}
+#timeModal .time-sheet{
+  position:relative!important;
+  z-index:100501!important;
+  width:min(100%,540px)!important;
+  max-width:540px!important;
+  max-height:72vh!important;
+  box-sizing:border-box!important;
+  overflow:auto!important;
+  padding:22px 20px calc(24px + env(safe-area-inset-bottom))!important;
+}
+#timeModal .time-actions{
+  position:relative!important;
+  z-index:2!important;
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:10px!important;
+  margin-top:16px!important;
+  padding-bottom:2px!important;
+}
+#timeModal .time-save,
+#timeModal .time-cancel{
+  min-height:50px!important;
+  height:50px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+
+/* Tap the task itself to edit its time; completion remains on the circle. */
+.timeline-card{cursor:pointer!important}
+.timeline-card .timeline-check{cursor:pointer!important}
+
+/* The accent is an interface system, not just a label color. */
+.progress:after{
+  background:radial-gradient(circle,rgba(var(--accent-rgb),.24),transparent 68%)!important;
+}
+.progress .bar i{
+  background:linear-gradient(90deg,var(--accent),rgba(var(--accent-rgb),.58))!important;
+  box-shadow:0 0 14px rgba(var(--accent-rgb),.22)!important;
+}
+#globalNav button.sel .nav-icon{
+  filter:drop-shadow(0 0 5px rgba(var(--accent-rgb),.22))!important;
+}
+.daytask .taskemoji,.tile .tileemoji{
+  background:rgba(var(--accent-rgb),.09)!important;
+}
+.timeline-list:before{
+  background:linear-gradient(to bottom,rgba(var(--accent-rgb),.12),rgba(var(--accent-rgb),.42),rgba(var(--accent-rgb),.08))!important;
+}
+.timeline-node{
+  box-shadow:0 0 0 1px rgba(var(--accent-rgb),.30),0 4px 10px rgba(53,48,43,.06)!important;
+}
+.detail-add,.timeline-edit{color:var(--accent)!important}
+.center-pill{
+  background:rgba(var(--accent-rgb),.96)!important;
+  box-shadow:0 10px 24px rgba(var(--accent-rgb),.20),inset 0 1px 0 rgba(255,255,255,.20)!important;
+}
 </style>
-<script id="ritm-v60-accent-runtime">
+
+<script id="ritm-v59-time-logic">
 (function(){
-  const prev=window.applyAppearance;
-  window.applyAppearance=function(){
-    if(typeof prev==='function') prev();
-    const map={
-      green:'#2f7668',pink:'#d985a3',lavender:'#8b82bd',sky:'#6d9fbe',peach:'#d58f73',butter:'#c4a044'
+  /* Main Day screen: tapping a task opens the same time editor as the Day screen. */
+  const originalDayTaskMarkup=window.dayTaskMarkup;
+  if(typeof originalDayTaskMarkup==='function'){
+    window.dayTaskMarkup=function(p,i){
+      const html=originalDayTaskMarkup(p,i);
+      return html
+        .replace('onclick="toggle(${i})"','onclick="openTimePicker(${i})"')
+        .replace('<span class="check">${p.done?"✓":""}</span>','<span class="check" onclick="event.stopPropagation();toggle(${i})">${p.done?"✓":""}</span>');
     };
-    const main=map[state?.accent]||map.green;
-    document.documentElement.style.setProperty('--emerald',main);
-    document.documentElement.style.setProperty('--accent',main);
+  }
+
+  /* Day detail: task body edits time; check circle completes the task. */
+  window.dayTimelineMarkup=function(a){
+    return a.map((p,i)=>{
+      const start=p.time||'';
+      const end=p.timeEnd||'';
+      const label=start?(end?`${start} — ${end}`:start):'Без времени';
+      const meta=start?(end?`Запланировано ${start}–${end}`:`Запланировано на ${start}`):'Добавь время';
+      const done=p.done?' done':'';
+      return `<div class="timeline-item${done}" data-index="${i}">
+        <div class="timeline-time">${label}</div>
+        <div class="timeline-track"><div class="timeline-node" aria-hidden="true"></div></div>
+        <div class="timeline-card" role="button" tabindex="0" onclick="openTimePicker(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTimePicker(${i})}">
+          <div class="timeline-card-top"><span class="timeline-task-name">${p.name}</span><span class="timeline-check" role="checkbox" aria-checked="${!!p.done}" onclick="event.stopPropagation();detailToggle(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();detailToggle(${i})}"></span></div>
+          <div class="timeline-card-meta"><span>${meta}</span><span class="timeline-edit">${start?'Изменить время':'Добавить время'}</span></div>
+        </div>
+      </div>`;
+    }).join('');
   };
-  window.applyAppearance();
-  if(typeof window.render==='function') window.render();
+
+  /* Save both start and end, then refresh whichever screen is currently visible. */
+  window.saveTaskTime=function(index){
+    const start=document.getElementById('taskStartInput')?.value||'';
+    const end=document.getElementById('taskEndInput')?.value||'';
+    const a=state.plans[state.date]||[], p=a[index];
+    if(!p)return;
+    if(start && end && end<=start){
+      const endInput=document.getElementById('taskEndInput');
+      if(endInput){endInput.setCustomValidity('Время окончания должно быть позже начала');endInput.reportValidity();}
+      return;
+    }
+    p.time=start;
+    p.timeEnd=end;
+    p.reminder=!!start;
+    state.plans[state.date]=a;
+    save();
+    document.getElementById('timeModal')?.remove();
+    if(document.getElementById('dayScreen')) renderDayInPlace();
+    else { refreshTaskUI(); syncAddedList?.(); syncSelectedTiles?.(); }
+    if(start) requestNotificationPermission().then(()=>scheduleOpenReminder(p));
+  };
+
+  /* The old picker is visually fine, but make sure the save controls remain reachable. */
+  const oldOpen=window.openTimePicker;
+  window.openTimePicker=function(index){
+    oldOpen(index);
+    const modal=document.getElementById('timeModal');
+    if(!modal)return;
+    modal.style.zIndex='100500';
+    const sheet=modal.querySelector('.time-sheet');
+    if(sheet){
+      sheet.style.zIndex='100501';
+      requestAnimationFrame(()=>sheet.scrollTop=0);
+    }
+  };
 })();
 </script>
